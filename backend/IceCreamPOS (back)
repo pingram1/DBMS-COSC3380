@@ -1,0 +1,74 @@
+# config.py
+class Config:
+    MYSQL_HOST = 'mysql-posdatabase-database-pos-3380.l.aivencloud.com'
+    MYSQL_PORT = 27790
+    MYSQL_USER = 'avnadmin'
+    MYSQL_PASSWORD = 'AVNS_4iwhblDyCsltSmeJoj8'
+    MYSQL_DB = 'defaultdb'
+
+
+# db.py
+import mysql.connector
+from config import Config
+
+def get_db_connection():
+    connection = mysql.connector.connect(
+        host=Config.MYSQL_HOST,
+        port=Config.MYSQL_PORT,
+        user=Config.MYSQL_USER,
+        password=Config.MYSQL_PASSWORD,
+        database=Config.MYSQL_DB
+    )
+    return connection
+
+
+from flask import Flask, jsonify, request
+from db import get_db_connection
+
+app = Flask(__name__)
+
+# Route to get all items
+@app.route('/items', methods=['GET'])
+def get_items():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute('SELECT * FROM Item')
+    items = cursor.fetchall()
+    conn.close()
+    return jsonify(items)
+
+# Route to add a new transaction
+@app.route('/transactions', methods=['POST'])
+def add_transaction():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    customer_id = request.json['Customer_ID']
+    total_price = request.json['Total_Price']
+    employee_id = request.json['Employee_ID']
+    
+    cursor.execute(
+        'INSERT INTO Transaction (Customer_ID, Employee_ID, Total_Price) VALUES (%s, %s, %s)', 
+        (customer_id, employee_id, total_price)
+    )
+    conn.commit()
+    conn.close()
+    return jsonify({'message': 'Transaction added successfully!'})
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+from mysql.connector import pooling
+
+pool = pooling.MySQLConnectionPool(
+    pool_name="mypool",
+    pool_size=10,
+    host=Config.MYSQL_HOST,
+    port=Config.MYSQL_PORT,
+    user=Config.MYSQL_USER,
+    password=Config.MYSQL_PASSWORD,
+    database=Config.MYSQL_DB
+)
+
+def get_db_connection():
+    return pool.get_connection()
