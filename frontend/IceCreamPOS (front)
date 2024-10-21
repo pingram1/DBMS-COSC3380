@@ -1,0 +1,61 @@
+const mysql = require('mysql2');
+
+// Create the connection to MySQL
+const connection = mysql.createConnection({
+  host: 'mysql-posdatabase-database-pos-3380.l.aivencloud.com',
+  port: '27790',
+  user: 'avnadmin',
+  password: 'AVNS_4iwhblDyCsltSmeJoj8',
+  database: 'defaultdb'
+});
+
+// Test the connection
+connection.connect((err) => {
+  if (err) {
+    console.error('Error connecting to the database:', err);
+    return;
+  }
+  console.log('Connected to the MySQL database!');
+});
+
+module.exports = connection;
+
+const express = require('express');
+const app = express();
+const db = require('./db');
+
+// Route to get all items
+app.get('/items', (req, res) => {
+  db.query('SELECT * FROM Item', (err, results) => {
+    if (err) {
+      res.status(500).send('Error retrieving items from database');
+      return;
+    }
+    res.json(results);
+  });
+});
+
+// Start the server
+app.listen(3000, () => {
+  console.log('Server is running on port 3000');
+});
+
+// Fetching all items
+fetch('/items')
+    .then(response => response.json())
+    .then(data => console.log(data));
+
+// Posting a new transaction
+fetch('/transactions', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+        Customer_ID: 1,
+        Employee_ID: 2,
+        Total_Price: 12.99
+    })
+})
+.then(response => response.json())
+.then(data => console.log(data));
