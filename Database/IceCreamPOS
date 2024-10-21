@@ -1,0 +1,190 @@
+-- Payment Types (Normalizing Payment_Type to avoid redundancy)
+CREATE TABLE `Payment_Types` (
+    `Payment_Type_ID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `Payment_Type` VARCHAR(30) NOT NULL
+);
+
+-- Promotions
+CREATE TABLE `Promotions`(
+    `Promotion_ID` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `Promotion_Type_ID` INT NOT NULL,
+    `Discount_Percentage` DECIMAL(3, 2) NULL,
+    `Discount_Amount` DECIMAL(10, 2) NULL,
+    `Start_Date` DATE NOT NULL,
+    `End_Date` DATE NOT NULL,
+    `Description` VARCHAR(255) NULL,
+    `Points_Cost` INT NOT NULL,
+    FOREIGN KEY (`Promotion_Type_ID`) REFERENCES `Promotion_Types`(`Promotion_Type_ID`)
+);
+
+-- Promotion Types (New Table)
+CREATE TABLE `Promotion_Types`(
+    `Promotion_Type_ID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `Promotion_Type` VARCHAR(30) NOT NULL
+);
+
+-- Customers
+CREATE TABLE `Customer`(
+    `Customer_ID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `Membership_Level` VARCHAR(30) NOT NULL,
+    `Phone_Number` VARCHAR(15) NULL,
+    `Address` VARCHAR(255) NULL,
+    `Account_Creation_Date` DATE NULL,
+    `Member_Length` INT NULL,
+    `Account_End` DATE NULL,
+    `Current_Discount_Points` INT NOT NULL,
+    `Discount_Points_Used` INT NOT NULL,
+    `Total_Accrued_Discount_Points` INT NOT NULL
+);
+
+-- Employees
+CREATE TABLE `Employee`(
+    `Employee_ID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `Name` VARCHAR(30) NOT NULL,
+    `Shift_Start` DATETIME NULL,
+    `Shift_End` DATETIME NULL,
+    `Length_of_Employment` INT NULL
+);
+
+-- Items
+CREATE TABLE `Item`(
+    `Item_ID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `Item_Name` VARCHAR(50) NOT NULL,
+    `Unit_Price` DECIMAL(10, 2) NOT NULL
+);
+
+-- Food Items
+CREATE TABLE `Food_Item`(
+    `Item_ID` INT NOT NULL,
+    `Calories` INT NULL,
+    `Protein` DECIMAL(10, 2) NULL,
+    `Sugar` DECIMAL(10, 2) NULL,
+    `Total_Carbs` DECIMAL(10, 2) NULL,
+    `Total_Fat` DECIMAL(10, 2) NULL,
+    `Intro_Date` DATE NULL,
+    `Discontinue_Date` DATE NULL,
+    `Last_Updated_Date` DATE NULL,
+    `VendorInvoice_ID` INT NULL,
+    PRIMARY KEY (`Item_ID`),
+    FOREIGN KEY (`Item_ID`) REFERENCES `Item`(`Item_ID`)
+);
+
+-- Transactions
+CREATE TABLE `Transaction`(
+    `Transaction_ID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `Customer_ID` INT NULL,
+    `Employee_ID` INT NULL,
+    `Total_Price` DECIMAL(10, 2) NOT NULL,
+    `Date` DATETIME NOT NULL,
+    `Payment_Type_ID` INT NOT NULL,
+    `Promotion_ID` INT NULL,
+    FOREIGN KEY (`Customer_ID`) REFERENCES `Customer`(`Customer_ID`),
+    FOREIGN KEY (`Employee_ID`) REFERENCES `Employee`(`Employee_ID`),
+    FOREIGN KEY (`Payment_Type_ID`) REFERENCES `Payment_Types`(`Payment_Type_ID`),
+    FOREIGN KEY (`Promotion_ID`) REFERENCES `Promotions`(`Promotion_ID`)
+);
+
+-- Transaction Items (many-to-many between Transaction and Item)
+CREATE TABLE `Transaction_Item`(
+    `Transaction_ID` INT NOT NULL,
+    `Item_ID` INT NOT NULL,
+    `Quantity_Sold` INT NOT NULL,
+    PRIMARY KEY (`Transaction_ID`, `Item_ID`),
+    FOREIGN KEY (`Transaction_ID`) REFERENCES `Transaction`(`Transaction_ID`),
+    FOREIGN KEY (`Item_ID`) REFERENCES `Item`(`Item_ID`)
+);
+
+-- Vendor and Supplies
+CREATE TABLE `Vendor`(
+    `Vendor_ID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `Vendor_Name` VARCHAR(50) NOT NULL,
+    `Contact_Info` VARCHAR(50) NULL,
+    `Address` VARCHAR(255) NULL
+);
+
+CREATE TABLE `VendorInvoice`(
+    `Invoice_ID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `Vendor_ID` INT NULL,
+    `Date_Received` DATE NOT NULL,
+    `Payment_Type_ID` INT NOT NULL,
+    `Total` DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (`Vendor_ID`) REFERENCES `Vendor`(`Vendor_ID`),
+    FOREIGN KEY (`Payment_Type_ID`) REFERENCES `Payment_Types`(`Payment_Type_ID`)
+);
+
+-- Vendor Price History
+CREATE TABLE `Vendor_Price_History`(
+    `Vendor_Price_History_ID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `Item_ID` INT NOT NULL,
+    `VendorInvoice_ID` INT NOT NULL,
+    `Vendor_Price` DECIMAL(10, 2) NOT NULL,
+    `Start_Date` DATE NOT NULL,
+    `End_Date` DATE NULL,
+    FOREIGN KEY (`Item_ID`) REFERENCES `Item`(`Item_ID`),
+    FOREIGN KEY (`VendorInvoice_ID`) REFERENCES `VendorInvoice`(`Invoice_ID`)
+);
+
+-- Retail Price History
+CREATE TABLE `Retail_Price_History`(
+    `Price_History_ID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `Item_ID` INT NOT NULL,
+    `Retail_Price` DECIMAL(10, 2) NOT NULL,
+    `Start_Date` DATE NOT NULL,
+    `End_Date` DATE NULL,
+    FOREIGN KEY (`Item_ID`) REFERENCES `Item`(`Item_ID`)
+);
+
+-- Returns
+CREATE TABLE `Returns`(
+    `Return_ID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `Transaction_ID` INT NULL,
+    `Return_Type` VARCHAR(30) NOT NULL,
+    FOREIGN KEY (`Transaction_ID`) REFERENCES `Transaction`(`Transaction_ID`)
+);
+
+CREATE TRIGGER apply_promotion
+BEFORE INSERT ON `Transaction`
+FOR EACH ROW
+BEGIN
+    DECLARE points_required INT;
+    DECLARE customer_points INT;
+
+    -- Get the points required for the promotion
+    SELECT Points_Cost INTO points_required
+    FROM Promotions
+    WHERE Promotion_ID = NEW.Promotion_ID;
+
+    -- Get the customer's current points
+    SELECT Current_Discount_Points INTO customer_points
+    FROM Customer
+    WHERE Customer_ID = NEW.Customer_ID;
+
+    -- If customer has enough points, apply the promotion
+    IF customer_points >= points_required THEN
+        -- Deduct the points from the customer's account
+        UPDATE Customer
+        SET Current_Discount_Points = Current_Discount_Points - points_required
+        WHERE Customer_ID = NEW.Customer_ID;
+    ELSE
+        -- If not enough points, set promotion to NULL
+        SET NEW.Promotion_ID = NULL;
+    END IF;
+END;
+
+CREATE TRIGGER update_last_updated
+BEFORE UPDATE ON `Food_Item`
+FOR EACH ROW
+BEGIN
+    SET NEW.Last_Updated_Date = NOW();
+END;
+
+CREATE TRIGGER reorder_supplies
+AFTER UPDATE ON `Supplies_Item`
+FOR EACH ROW
+BEGIN
+    IF NEW.Quantity < NEW.Reorder_Trigger THEN
+        -- Trigger reorder process here (e.g., inserting into an Orders table)
+        INSERT INTO VendorInvoice (Vendor_ID, Date_Received, Payment_Type_ID, Total)
+        VALUES (NEW.VendorInvoice_ID, NOW(), 1, 0); -- Example insert
+    END IF;
+END;
