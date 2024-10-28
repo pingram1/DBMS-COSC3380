@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/api';
 
 const Shop = () => {
   const [items, setItems] = useState([]);
@@ -12,7 +12,7 @@ const Shop = () => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/shop/all-flavors');
+        const response = await api.get('/api/shop/all-flavors');
         setItems(response.data);
         setLoading(false);
       } catch (err) {
@@ -33,7 +33,7 @@ const Shop = () => {
     }
 
     try {
-      const response = await axios.get(`http://localhost:5000/shop/all-flavors/${item.Item_ID}`);
+      const response = await api.get(`/api/shop/all-flavors/${item.Item_ID}`);
       setItemDetails(response.data);
       setSelectedItem(item);
     } catch (err) {

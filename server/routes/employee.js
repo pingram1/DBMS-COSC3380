@@ -2,22 +2,22 @@ const express = require('express');
 const router = express.Router();
 const { pool } = require('../config/db');
 
-// Test connection endpoint
-router.get('/test', async (req, res) => {
-    try {
-        const [result] = await pool.query('SELECT 1');
-        res.json({ 
-            message: 'Database connection successful',
-            result 
-        });
-    } catch (error) {
-        console.error('Database test failed:', error);
-        res.status(500).json({ 
-            error: 'Database test failed',
-            details: error.message
-        });
-    }
-});
+// // Test connection endpoint
+// router.get('/test', async (req, res) => {
+//     try {
+//         const [result] = await pool.query('SELECT 1');
+//         res.json({ 
+//             message: 'Database connection successful',
+//             result 
+//         });
+//     } catch (error) {
+//         console.error('Database test failed:', error);
+//         res.status(500).json({ 
+//             error: 'Database test failed',
+//             details: error.message
+//         });
+//     }
+// });
 
 // Get all employees
 router.get('/', async (req, res) => {

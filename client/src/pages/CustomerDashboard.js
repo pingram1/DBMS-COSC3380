@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/api';
 
 const CustomerAccount = () => {
   const [customerData, setCustomerData] = useState(null);
@@ -10,7 +10,7 @@ const CustomerAccount = () => {
     const fetchCustomerData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5000/acc/customer/account', {
+        const response = await api.get('api/acc/customer/account', {
           headers: { Authorization: `Bearer ${token}` }
         });
         setCustomerData(response.data);

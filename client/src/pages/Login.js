@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import api from '../api/api';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
@@ -26,8 +26,8 @@ const Login = () => {
 
     try {
       const endpoint = loginType === 'admin' 
-        ? '/auth/admin/login' 
-        : '/auth/customer/login';
+        ? '/api/auth/admin/login' 
+        : '/api/auth/customer/login';
 
       const payload = loginType === 'admin'
         ? {
@@ -39,7 +39,7 @@ const Login = () => {
             phoneNumber: formData.phoneNumber
           };
 
-      const response = await axios.post(`http://localhost:5000${endpoint}`, payload);
+      const response = await api.post(endpoint, payload);
       
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('userRole', response.data.user.role);
