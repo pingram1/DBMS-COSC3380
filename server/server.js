@@ -9,7 +9,7 @@ require('dotenv').config();
 // Middleware
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' 
-      ? ['https://your-frontend-domain.vercel.app'] 
+      ? ['https://dbms-cosc-3380client.vercel.app/'] 
       : 'http://localhost:3000',
     credentials: true
   }));
