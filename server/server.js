@@ -1,7 +1,7 @@
 const express = require('express');
-const app = express();
+const path = require('path');
 const cors = require('cors');
-const db = require('./config/db');
+const app = express();
 
 // Load environment variables
 require('dotenv').config();
@@ -9,7 +9,7 @@ require('dotenv').config();
 // Middleware
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' 
-      ? ['https://your-frontend-domain.vercel.app'] // Replace with your frontend domain
+      ? ['https://your-frontend-domain.vercel.app'] 
       : 'http://localhost:3000',
     credentials: true
   }));
@@ -34,13 +34,32 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Listening to server changes
-if (process.env.NODE_ENV !== 'production') {
-    const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
-        console.log(`Server is running on http://localhost:${PORT}`);
-    });
-}
+// Health check endpoint & testing
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok' });
+  });
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'API is working!' });
+});
 
-// This is for Vercel deployment
-module.exports = app;
+// Listening to server changes
+if (process.env.NODE_ENV === 'production') {
+    // Serve static files if you have them
+    if (process.env.SERVE_STATIC === 'true') {
+      app.use(express.static('public'));
+    
+      app.get('*', (req, res) => {
+        res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
+      });
+    }
+  }
+  
+  // Server startup
+  const PORT = process.env.PORT || 5000;
+  if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+  }
+  
+  module.exports = app;
