@@ -13,9 +13,11 @@ const Shop = () => {
     const fetchItems = async () => {
       try {
         const response = await shopAPI.getAllFlavors;
-        setItems(response.data);
+        console.log('API Response:', response.data); // log
+        setItems(response.data || []); // Ensure it's an array
         setLoading(false);
       } catch (err) {
+        console.error('Error fetching items:', err); // log
         setError('Error loading items');
         setLoading(false);
       }
@@ -33,7 +35,7 @@ const Shop = () => {
     }
 
     try {
-      const response = await shopAPI.getFlavorById;
+      const response = await shopAPI.getFlavorById(item.Item_ID);
       setItemDetails(response.data);
       setSelectedItem(item);
     } catch (err) {
@@ -43,6 +45,16 @@ const Shop = () => {
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
+
+  // Ensure items is an array before rendering
+  if (!Array.isArray(items)) {
+    console.error('Items is not an array:', items);
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl">No items available</div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: '20px' }}>
@@ -82,7 +94,7 @@ const Shop = () => {
               {/* Item Info */}
               <div style={{ padding: '15px' }}>
                 <h3 style={{ marginBottom: '10px', fontSize: '18px' }}>{item.Item_Name}</h3>
-                <p style={{ color: '#666' }}>${item.Unit_Price}</p>
+                <p style={{ color: '#666' }}>${item.Unit_Price || 'N/A'}</p>
               </div>
 
               {/* Item Details (shows when selected) */}
