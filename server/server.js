@@ -8,12 +8,16 @@ require('dotenv').config();
 
 // Middleware
 app.use(cors({
-    origin: process.env.NODE_ENV === 'production' 
-      ? ['https://dbms-cosc-3380client.vercel.app/'] 
-      : 'http://localhost:3000',
+    origin: [
+      'https://dbms-cosc-3380client.vercel.app',
+      'http://localhost:3000'
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
   }));
-  app.use(express.json());
+
+app.use(express.json());
 
 // Routers
 const employeeRouter = require('./routes/employee');
@@ -21,9 +25,9 @@ const authRouter = require('./routes/auth');
 const itemsRouter = require('./routes/shop');
 
 // Use Routes
-app.use('/api/employee', employeeRouter);
-app.use('/api/auth', authRouter);
-app.use('/api/shop', itemsRouter);
+app.use('/shop', itemsRouter);
+app.use('/auth', authRouter);
+app.use('/employee', employeeRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

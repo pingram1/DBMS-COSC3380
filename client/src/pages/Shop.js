@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import api from '../api/api';
+import api, { shopAPI } from '../api/api';
 
 const Shop = () => {
   const [items, setItems] = useState([]);
@@ -12,7 +12,7 @@ const Shop = () => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await api.get('/api/shop/all-flavors');
+        const response = await shopAPI.getAllFlavors;
         setItems(response.data);
         setLoading(false);
       } catch (err) {
@@ -33,7 +33,7 @@ const Shop = () => {
     }
 
     try {
-      const response = await api.get(`/api/shop/all-flavors/${item.Item_ID}`);
+      const response = await shopAPI.getFlavorById;
       setItemDetails(response.data);
       setSelectedItem(item);
     } catch (err) {

@@ -38,10 +38,10 @@ api.interceptors.response.use(
 // Auth API endpoints
 const authAPI = {
   customerLogin: (phoneNumber) => 
-    api.post('/api/auth/customer/login', { phoneNumber }),
+    api.post('/auth/customer/login', { phoneNumber }),
   
   adminLogin: (credentials) => 
-    api.post('/api/auth/admin/login', credentials),
+    api.post('/auth/admin/login', credentials),
     
   logout: () => {
     localStorage.removeItem('token');
@@ -52,34 +52,33 @@ const authAPI = {
 // Shop API endpoints
 const shopAPI = {
   getAllFlavors: () => 
-    api.get('/api/shop/all-flavors'),
+    api.get('/shop/all-flavors'),
   
   getFlavorById: (id) => 
-    api.get(`/api/shop/all-flavors/${id}`)
+    api.get(`/shop/all-flavors/${id}`)
 };
 
 // Employee API endpoints (for admin)
 // TBD
 const employeeAPI = {
   getAllEmployees: () => 
-    api.get('/api/employee'),
+    api.get('/employee'),
   
   getEmployeeById: (id) => 
-    api.get(`/api/employee/${id}`),
+    api.get(`/employee/${id}`),
   
   createEmployee: (employeeData) => 
-    api.post('/api/employee', employeeData),
+    api.post('/employee', employeeData),
   
   updateEmployee: (id, employeeData) => 
-    api.put(`/api/employee/${id}`, employeeData),
+    api.put(`/employee/${id}`, employeeData),
   
   deleteEmployee: (id) => 
-    api.delete(`/api/employee/${id}`)
+    api.delete(`/employee/${id}`)
 };
 
 export {
   api as default,
   authAPI,
-  shopAPI,
-  employeeAPI
+  shopAPI
 };
