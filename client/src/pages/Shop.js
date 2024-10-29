@@ -12,9 +12,8 @@ const Shop = () => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        console.log('Fetching items...'); // Debug log
         const response = await shopAPI.getAllFlavors(); // Added parentheses to call the function
-        console.log('Full response:', response); // log
+
         setItems(response.data || []); // Ensure it's an array
         setLoading(false);
       } catch (err) {

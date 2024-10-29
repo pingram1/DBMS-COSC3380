@@ -1,12 +1,17 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const app = express();
 
 // Load environment variables
 require('dotenv').config();
 
 // Middleware
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // max 100 requests per windowMs
+});
 app.use(cors({
     origin: [
       'https://dbms-cosc-3380client.vercel.app',
@@ -40,21 +45,13 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Health check endpoint & testing
-app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok' });
-  });
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'API is working!' });
-});
-
 // Listening to server changes
 if (process.env.NODE_ENV === 'production') {
     // Serve static files if you have them
     if (process.env.SERVE_STATIC === 'true') {
       app.use(express.static('public'));
     
-      app.get('*', (req, res) => {
+      app.get('*',limiter, (req, res) => {
         res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
       });
     }
