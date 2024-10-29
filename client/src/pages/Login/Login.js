@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authService } from '../api';
+import { authService } from '../../api';
 
 const Login = () => {
   const [loginType, setLoginType] = useState('customer');

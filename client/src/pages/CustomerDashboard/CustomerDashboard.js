@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { customerService } from '../api';
+import { customerService } from '../../api';
 import { useNavigate } from 'react-router-dom';
 
 const CustomerDashboard = () => {
