@@ -31,19 +31,19 @@ Before you begin, ensure you have the following installed:
 ## Project Structure
 
 ```text
-ice-cream-shop/
+root/
 ├── client/                 # React frontend
 │   ├── src/
 │   │   ├── api/           # API configuration
 │   │   ├── components/    # Reusable components
 │   │   ├── pages/        # Page components
-│   │   └── ...
-│   └── package.json
+│   │   ├── utils/        # Utility functions
+│   │   ├── App.js        
 └── server/                # Node.js backend
     ├── config/            # Database configuration
     ├── routes/           # API routes
     ├── middlewares/      # Custom middlewares
-    └── package.json
+    ├── server.js         
 ```
 
 ## Installation
