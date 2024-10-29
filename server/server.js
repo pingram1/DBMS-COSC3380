@@ -1,24 +1,35 @@
 const express = require('express');
-const app = express();
+const path = require('path');
 const cors = require('cors');
-const db = require('./config/db');
+const app = express();
 
 // Load environment variables
 require('dotenv').config();
 
 // Middleware
+app.use(cors({
+    origin: [
+      'https://dbms-cosc-3380client.vercel.app',
+      'http://localhost:3000'
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+  }));
+
 app.use(express.json());
-app.use(cors());
 
 // Routers
 const employeeRouter = require('./routes/employee');
 const authRouter = require('./routes/auth');
 const itemsRouter = require('./routes/shop');
+const customerRouter = require('./routes/customers');
 
 // Use Routes
-app.use('/employee', employeeRouter);
-app.use('/auth', authRouter);
 app.use('/shop', itemsRouter);
+app.use('/auth', authRouter);
+app.use('/employee', employeeRouter);
+app.use('/acc', customerRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -29,8 +40,32 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Listening to server changes
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+// Health check endpoint & testing
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok' });
+  });
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'API is working!' });
 });
+
+// Listening to server changes
+if (process.env.NODE_ENV === 'production') {
+    // Serve static files if you have them
+    if (process.env.SERVE_STATIC === 'true') {
+      app.use(express.static('public'));
+    
+      app.get('*', (req, res) => {
+        res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
+      });
+    }
+  }
+  
+  // Server startup
+  const PORT = process.env.PORT || 5000;
+  if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+  }
+  
+  module.exports = app;

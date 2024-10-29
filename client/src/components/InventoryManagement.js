@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/api';
 
 const InventoryManagement = () => {
   const [items, setItems] = useState([]);
@@ -20,7 +20,7 @@ const InventoryManagement = () => {
   const fetchItems = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/shop/all-flavors', {
+      const response = await api.get('api/shop/all-flavors', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setItems(response.data);
@@ -40,7 +40,7 @@ const InventoryManagement = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/shop/all-flavors', newItem, {
+      await api.post('api/shop/all-flavors', newItem, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchItems();
@@ -63,7 +63,7 @@ const InventoryManagement = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`http://localhost:5000/shop/all-flavors/${editingItem.Item_ID}`, editingItem, {
+      await api.put(`api/shop/all-flavors/${editingItem.Item_ID}`, editingItem, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchItems();
@@ -78,7 +78,7 @@ const InventoryManagement = () => {
     if (window.confirm('Are you sure you want to delete this item?')) {
       try {
         const token = localStorage.getItem('token');
-        await axios.delete(`http://localhost:5000/shop/all-flavors/${itemId}`, {
+        await api.delete(`api/shop/all-flavors/${itemId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         fetchItems();
