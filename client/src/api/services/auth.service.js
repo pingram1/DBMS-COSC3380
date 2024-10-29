@@ -1,14 +1,13 @@
-import { api } from '../axios.js';
+import { api } from '../axios';
 import API_CONFIG from '../config';
 
 export const authService = {
   customerLogin: async (phoneNumber) => {
     try {
-      const response = await api.post(
+      return await api.post(
         API_CONFIG.ENDPOINTS.AUTH.CUSTOMER_LOGIN, 
         { phoneNumber }
       );
-      return response.data;
     } catch (error) {
       throw error;
     }
@@ -16,11 +15,10 @@ export const authService = {
 
   adminLogin: async (credentials) => {
     try {
-      const response = await api.post(
+      return await api.post(
         API_CONFIG.ENDPOINTS.AUTH.ADMIN_LOGIN, 
         credentials
       );
-      return response.data;
     } catch (error) {
       throw error;
     }
