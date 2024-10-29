@@ -18,14 +18,10 @@ router.get('/customer/account', authMiddleware, async (req, res) => {
         FROM customer c
         WHERE c.Customer_ID = ?
       `;
-      console.log('Executing query:', query);
-      console.log('With params:', [req.user.id]);
-  
+
       const [customerRows] = await pool.query(query, [req.user.id]);
-      console.log('Query result:', customerRows);
   
       if (customerRows.length === 0) {
-        console.log('No customer found for ID:', req.user.id);
         return res.status(404).json({ error: 'Customer not found' });
       }
 

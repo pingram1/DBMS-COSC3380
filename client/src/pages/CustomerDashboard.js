@@ -11,14 +11,9 @@ const CustomerDashboard = () => {
   useEffect(() => {
     const fetchCustomerData = async () => {
       try {
-        setLoading(true);
-        // Debug: Check if token exists
-        const token = localStorage.getItem('token');
-        console.log('Token exists:', !!token);
-        
-        console.log('Fetching customer data...');
+        setLoading(true); // set loading to display while api getting the data
+   
         const response = await customerAPI.getAccount();
-        console.log('Customer data response:', response);
         
         if (response?.data) {
           setCustomerData(response.data);

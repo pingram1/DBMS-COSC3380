@@ -21,8 +21,7 @@ api.interceptors.request.use(
       // Add Bearer prefix to token
       config.headers.Authorization = `Bearer ${token}`;
     }
-    console.log('Making request to:', config.baseURL + config.url);
-    console.log('With headers:', config.headers);
+    console.log('Making request to:', config.baseURL + config.url); //log url
     return config;
   },
   (error) => {
