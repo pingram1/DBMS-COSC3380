@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import api, { shopAPI } from '../api/api';
+import { shopAPI } from '../api/api';
 
 const Shop = () => {
   const [items, setItems] = useState([]);
@@ -12,8 +12,9 @@ const Shop = () => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await shopAPI.getAllFlavors;
-        console.log('API Response:', response.data); // log
+        console.log('Fetching items...'); // Debug log
+        const response = await shopAPI.getAllFlavors(); // Added parentheses to call the function
+        console.log('Full response:', response); // log
         setItems(response.data || []); // Ensure it's an array
         setLoading(false);
       } catch (err) {

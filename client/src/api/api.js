@@ -1,8 +1,13 @@
 import axios from 'axios';
 
-// Create axios instance with default config
+const BACKEND_URL = process.env.NODE_ENV === 'production'
+  ? 'https://dbms-cosc-3380.vercel.app'
+  : 'http://localhost:5000';
+
+console.log('Using backend URL:', BACKEND_URL);
+
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL: BACKEND_URL,
   headers: {
     'Content-Type': 'application/json'
   }
@@ -11,6 +16,7 @@ const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
+    console.log('Making request to:', config.baseURL + config.url);
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -18,6 +24,7 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
+    console.error('Request error:', error);
     return Promise.reject(error);
   }
 );
@@ -26,11 +33,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('userRole');
-      window.location.href = '/login';
-    }
+    console.error('API Error:', error.response?.data || error.message);
     return Promise.reject(error);
   }
 );
@@ -51,31 +54,28 @@ const authAPI = {
 
 // Shop API endpoints
 const shopAPI = {
-  getAllFlavors: () => 
-    api.get('/shop/all-flavors'),
-  
-  getFlavorById: (id) => 
-    api.get(`/shop/all-flavors/${id}`)
+  getAllFlavors: () => api.get('/shop/all-flavors'),
+  getFlavorById: (id) => api.get(`/shop/all-flavors/${id}`)
 };
 
 // Employee API endpoints (for admin)
 // TBD
-const employeeAPI = {
-  getAllEmployees: () => 
-    api.get('/employee'),
+// const employeeAPI = {
+//   getAllEmployees: () => 
+//     api.get('/employee'),
   
-  getEmployeeById: (id) => 
-    api.get(`/employee/${id}`),
+//   getEmployeeById: (id) => 
+//     api.get(`/employee/${id}`),
   
-  createEmployee: (employeeData) => 
-    api.post('/employee', employeeData),
+//   createEmployee: (employeeData) => 
+//     api.post('/employee', employeeData),
   
-  updateEmployee: (id, employeeData) => 
-    api.put(`/employee/${id}`, employeeData),
+//   updateEmployee: (id, employeeData) => 
+//     api.put(`/employee/${id}`, employeeData),
   
-  deleteEmployee: (id) => 
-    api.delete(`/employee/${id}`)
-};
+//   deleteEmployee: (id) => 
+//     api.delete(`/employee/${id}`)
+// };
 
 export {
   api as default,
