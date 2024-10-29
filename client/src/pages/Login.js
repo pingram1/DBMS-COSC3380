@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { authAPI } from '../api/api';
+import { authService } from '../api';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
@@ -33,18 +33,15 @@ const Login = () => {
           lastName: formData.lastName,
           employeeId: formData.employeeId
         };
-        response = await authAPI.adminLogin(adminCredentials);
+        response = await authService.adminLogin(adminCredentials);
       } else {
-        response = await authAPI.customerLogin(formData.phoneNumber);
+        response = await authService.customerLogin(formData.phoneNumber);
       }
       
-      console.log('Login response:', response);
-      
       // Redirect based on role
-      if (response?.data?.token) {
-        // Store token and user role
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('userRole', response.data.user.role);
+      if (response?.token) { 
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('userRole', response.user.role);
         
         // Redirect based on role
         if (response.data.user.role === 'admin') {
@@ -57,7 +54,7 @@ const Login = () => {
       }
     } catch (err) {
       console.error('Login error:', err);
-      setError(err.response?.data?.error || 'Login failed. Please try again.');
+      setError(err.message || 'Login failed. Please try again.');
     }
   };
 

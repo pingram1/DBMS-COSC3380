@@ -5,6 +5,7 @@ A web-based management system for ice cream shops with separate interfaces for a
 ## Features
 
 ### Customer Features
+
 - Phone number-based login system
 - View ice cream flavors and details
 - Track loyalty points and membership status
@@ -12,6 +13,7 @@ A web-based management system for ice cream shops with separate interfaces for a
 - Profile management
 
 ### Admin Features
+
 - Secure employee login system
 - Inventory management
 - View and manage products
@@ -21,12 +23,14 @@ A web-based management system for ice cream shops with separate interfaces for a
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
+
 - [Node.js](https://nodejs.org/) (v14.0.0 or higher)
 - [MySQL](https://www.mysql.com/) (v8.0 or higher)
 - [Git](https://git-scm.com/) (for cloning the repository)
 
 ## Project Structure
-```
+
+```text
 ice-cream-shop/
 ├── client/                 # React frontend
 │   ├── src/
@@ -42,10 +46,10 @@ ice-cream-shop/
     └── package.json
 ```
 
-
 ## Installation
 
 ### 1. Clone the Repository
+
 ```bash
 git clone <repository-url>
 cd <root folder>
@@ -54,17 +58,20 @@ cd <root folder>
 ### 2. Backend Setup
 
 Navigate to the server directory and install dependencies:
+
 ```bash
 cd server
 npm install
 ```
 
 Required backend dependencies:
+
 ```bash
 npm install 
 ```
 
 Create a `.env` file in the server directory:
+
 ```env
 MYSQL_HOST=your_host
 MYSQL_USER=your_user
@@ -77,30 +84,36 @@ JWT_SECRET=your_jwt_secret
 ### 3. Frontend Setup
 
 Navigate to the client directory and install dependencies:
+
 ```bash
 cd ../client
 npm install
 ```
 
 Required frontend dependencies:
+
 ```bash
 npm install 
 ```
+
 Create a `.env` file in the client directory:
+
 ```env
 REACT_APP_API_URL=http://localhost:5000
 ```
 
 ## Running the Application
 
-1. Start the backend server:
+Start the backend server:
+
 ```bash
 cd server
 npm start
 # Server will run on http://localhost:5000
 ```
 
-2. Start the frontend application:
+Start the frontend application:
+
 ```bash
 cd client
 npm start
@@ -110,14 +123,17 @@ npm start
 ## API Endpoints
 
 ### Authentication
+
 - POST `/auth/admin/login` - Employee login
 - POST `/auth/customer/login` - Customer login
 
 ### Shop
+
 - GET `/shop/all-flavors` - Get all ice cream flavors
 - GET `/shop/all-flavors/:id` - Get specific flavor details
 
 ### Customer Account
+
 - GET `/acc/customer/account` - Get customer account details
 - PUT `/acc/customer/account` - Update customer information
 - GET `/acc/customer/orders` - Get customer order history
@@ -125,7 +141,9 @@ npm start
 ## Deployment
 
 ### Backend (Vercel)
-1. Create vercel.json:
+
+Create vercel.json:
+
 ```json
 {
   "version": 2,
@@ -141,6 +159,7 @@ npm start
 ```
 
 ### Frontend (Vercel)
+
 1. Update environment variables in Vercel dashboard
 2. Configure build settings
 3. Deploy from GitHub repository

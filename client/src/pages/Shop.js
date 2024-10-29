@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { shopAPI } from '../api/api';
+import { shopService } from '../api';
 
 const Shop = () => {
   const [items, setItems] = useState([]);
@@ -12,13 +12,12 @@ const Shop = () => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await shopAPI.getAllFlavors(); // Added parentheses to call the function
-
-        setItems(response.data || []); // Ensure it's an array
+        const items = await shopService.getAllFlavors(); 
+        setItems(items || []); // Make sure data is an array
         setLoading(false);
       } catch (err) {
-        console.error('Error fetching items:', err); // log
-        setError('Error loading items');
+        console.error('Error fetching items:', err);
+        setError(err.message || 'Error loading items');
         setLoading(false);
       }
     };
@@ -35,11 +34,11 @@ const Shop = () => {
     }
 
     try {
-      const response = await shopAPI.getFlavorById(item.Item_ID);
-      setItemDetails(response.data);
+      const details = await shopService.getFlavorById(item.Item_ID);
+      setItemDetails(details);
       setSelectedItem(item);
     } catch (err) {
-      setError('Error loading item details');
+      setError(err.message || 'Error loading item details');
     }
   };
 
