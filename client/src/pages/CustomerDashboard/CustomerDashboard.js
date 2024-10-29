@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { customerAPI } from '../api/api';
+import { customerService } from '../../api';
 import { useNavigate } from 'react-router-dom';
 
 const CustomerDashboard = () => {
@@ -11,27 +11,22 @@ const CustomerDashboard = () => {
   useEffect(() => {
     const fetchCustomerData = async () => {
       try {
-        setLoading(true); // set loading to display while api getting the data
+        setLoading(true); // Set loading while fetching the data
    
-        const response = await customerAPI.getAccount();
+        const data = await customerService.getAccount(); 
         
-        if (response?.data) {
-          setCustomerData(response.data);
+        if (data) {
+          setCustomerData(data);
         } else {
           setError('No data received from server');
         }
       } catch (err) {
-        console.error('Error fetching customer data:', {
-          message: err.message,
-          response: err.response?.data,
-          status: err.response?.status
-        });
+        console.error('Error fetching customer data:', err);
         
-        if (err.response?.status === 401) {
-          console.log('Unauthorized - redirecting to login');
+        if (err.status === 401) {
           navigate('/login');
         } else {
-          setError(err.response?.data?.error || 'Failed to load customer data');
+          setError(err.message || 'Failed to load customer data');
         }
       } finally {
         setLoading(false);

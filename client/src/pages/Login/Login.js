@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { authAPI } from '../api/api';
 import { useNavigate } from 'react-router-dom';
+import { authService } from '../../api';
 
 const Login = () => {
-  const [loginType, setLoginType] = useState('customer'); // customer or admin
+  const [loginType, setLoginType] = useState('customer');
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -33,14 +33,12 @@ const Login = () => {
           lastName: formData.lastName,
           employeeId: formData.employeeId
         };
-        response = await authAPI.adminLogin(adminCredentials);
+        response = await authService.adminLogin(adminCredentials);
       } else {
-        response = await authAPI.customerLogin(formData.phoneNumber);
+        response = await authService.customerLogin(formData.phoneNumber);
       }
       
-      console.log('Login response:', response);
-      
-      // Redirect based on role
+      // Properly access the nested data structure
       if (response?.data?.token) {
         // Store token and user role
         localStorage.setItem('token', response.data.token);
@@ -57,7 +55,14 @@ const Login = () => {
       }
     } catch (err) {
       console.error('Login error:', err);
-      setError(err.response?.data?.error || 'Login failed. Please try again.');
+      // More specific error handling
+      if (err.response?.status === 401) {
+        setError('Invalid credentials. Please try again.');
+      } else if (err.response?.data?.error) {
+        setError(err.response.data.error);
+      } else {
+        setError('Login failed. Please try again.');
+      }
     }
   };
 
@@ -70,6 +75,7 @@ const Login = () => {
           </h2>
           <div className="mt-4 flex justify-center space-x-4">
             <button
+              type="button"
               onClick={() => setLoginType('customer')}
               className={`px-4 py-2 rounded-md ${
                 loginType === 'customer'
@@ -80,6 +86,7 @@ const Login = () => {
               Customer
             </button>
             <button
+              type="button"
               onClick={() => setLoginType('admin')}
               className={`px-4 py-2 rounded-md ${
                 loginType === 'admin'
