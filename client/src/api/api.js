@@ -16,11 +16,13 @@ const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    console.log('Making request to:', config.baseURL + config.url);
     const token = localStorage.getItem('token');
     if (token) {
+      // Add Bearer prefix to token
       config.headers.Authorization = `Bearer ${token}`;
     }
+    console.log('Making request to:', config.baseURL + config.url);
+    console.log('With headers:', config.headers);
     return config;
   },
   (error) => {
@@ -33,6 +35,12 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    if (error.response?.status === 401) {
+      // Handle unauthorized error
+      localStorage.removeItem('token');
+      localStorage.removeItem('userRole');
+      window.location.href = '/login';
+    }
     console.error('API Error:', error.response?.data || error.message);
     return Promise.reject(error);
   }
@@ -50,6 +58,11 @@ const authAPI = {
     localStorage.removeItem('token');
     localStorage.removeItem('userRole');
   }
+};
+
+// Customer API endpoints
+const customerAPI = {
+  getAccount: () => api.get('/acc/customer/account'),
 };
 
 // Shop API endpoints
@@ -80,5 +93,6 @@ const shopAPI = {
 export {
   api as default,
   authAPI,
+  customerAPI,
   shopAPI
 };

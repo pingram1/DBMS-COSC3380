@@ -23,11 +23,13 @@ app.use(express.json());
 const employeeRouter = require('./routes/employee');
 const authRouter = require('./routes/auth');
 const itemsRouter = require('./routes/shop');
+const customerRouter = require('./routes/customers');
 
 // Use Routes
 app.use('/shop', itemsRouter);
 app.use('/auth', authRouter);
 app.use('/employee', employeeRouter);
+app.use('/acc', customerRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import api from '../api/api';
+import { authAPI } from '../api/api';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
@@ -25,33 +25,43 @@ const Login = () => {
     setError('');
 
     try {
-      const endpoint = loginType === 'admin' 
-        ? '/api/auth/admin/login' 
-        : '/api/auth/customer/login';
-
-      const payload = loginType === 'admin'
-        ? {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            employeeId: formData.employeeId
-          }
-        : {
-            phoneNumber: formData.phoneNumber
-          };
-
-      const response = await api.post(endpoint, payload);
+      let response;
       
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('userRole', response.data.user.role);
+      if (loginType === 'admin') {
+        const adminCredentials = {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          employeeId: formData.employeeId
+        };
+        response = await authAPI.adminLogin(adminCredentials);
+      } else {
+        response = await authAPI.customerLogin(formData.phoneNumber);
+      }
+      
+      console.log('Login response:', response);
       
       // Redirect based on role
-      if (response.data.user.role === 'admin') {
-        navigate('/admin/dashboard');
+      if (response?.data?.token) {
+        // Store token and user role
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('userRole', response.data.user.role);
+        
+        // Log stored data
+        console.log('Stored token:', localStorage.getItem('token'));
+        console.log('Stored role:', localStorage.getItem('userRole'));
+        
+        // Redirect based on role
+        if (response.data.user.role === 'admin') {
+          navigate('/admin/dashboard');
+        } else {
+          navigate('/customer/dashboard');
+        }
       } else {
-        navigate('/customer/dashboard');
+        setError('Invalid response from server');
       }
     } catch (err) {
-      setError(err.response?.data?.error || 'Login failed');
+      console.error('Login error:', err);
+      setError(err.response?.data?.error || 'Login failed. Please try again.');
     }
   };
 
