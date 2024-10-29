@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import api from '../api/api';
+import { api } from '../api';
 
 const InventoryManagement = () => {
   const [items, setItems] = useState([]);
@@ -19,14 +19,11 @@ const InventoryManagement = () => {
   // Fetch all items
   const fetchItems = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await api.get('api/shop/all-flavors', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get('/shop/all-flavors');
       setItems(response.data);
       setLoading(false);
     } catch (err) {
-      setError('Error loading items');
+      setError(err.message || 'Error loading items');
       setLoading(false);
     }
   };
@@ -39,10 +36,7 @@ const InventoryManagement = () => {
   const handleAddItem = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
-      await api.post('api/shop/all-flavors', newItem, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.post('/shop/all-flavors', newItem);
       fetchItems();
       setNewItem({
         Item_Name: '',
@@ -54,7 +48,7 @@ const InventoryManagement = () => {
         Total_Fat: ''
       });
     } catch (err) {
-      setError('Error adding item');
+      setError(err.message || 'Error adding item');
     }
   };
 

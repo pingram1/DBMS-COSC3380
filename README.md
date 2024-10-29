@@ -2,50 +2,76 @@
 
 A web-based management system for ice cream shops with separate interfaces for administrators (employees) and customers.
 
+## Features
+
+### Customer Features
+
+- Phone number-based login system
+- View ice cream flavors and details
+- Track loyalty points and membership status
+- View order history
+- Profile management
+
+### Admin Features
+
+- Secure employee login system
+- Inventory management
+- View and manage products
+- Employee management
+- Order tracking
+
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
+
 - [Node.js](https://nodejs.org/) (v14.0.0 or higher)
 - [MySQL](https://www.mysql.com/) (v8.0 or higher)
 - [Git](https://git-scm.com/) (for cloning the repository)
 
 ## Project Structure
-```
-ice-cream-shop/
-├── client/             # React frontend
+
+```text
+root/
+├── client/                 # React frontend
 │   ├── src/
-│   ├── package.json
-│   └── ...
-└── server/            # Node.js backend
-    ├── config/
-    ├── routes/
-    ├── middleware/
-    ├── package.json
-    └── ...
+│   │   ├── api/           # API configuration
+│   │   ├── components/    # Reusable components
+│   │   ├── pages/        # Page components
+│   │   ├── utils/        # Utility functions
+│   │   ├── App.js        
+└── server/                # Node.js backend
+    ├── config/            # Database configuration
+    ├── routes/           # API routes
+    ├── middlewares/      # Custom middlewares
+    ├── server.js         
 ```
 
 ## Installation
 
 ### 1. Clone the Repository
+
 ```bash
 git clone <repository-url>
-cd ice-cream-shop
+cd <root folder>
 ```
 
 ### 2. Backend Setup
 
 Navigate to the server directory and install dependencies:
+
 ```bash
 cd server
 npm install
 ```
 
 Required backend dependencies:
+
 ```bash
-npm install express cors mysql2 dotenv jsonwebtoken nodemon
+npm install 
 ```
 
 Create a `.env` file in the server directory:
+
 ```env
 MYSQL_HOST=your_host
 MYSQL_USER=your_user
@@ -58,118 +84,103 @@ JWT_SECRET=your_jwt_secret
 ### 3. Frontend Setup
 
 Navigate to the client directory and install dependencies:
+
 ```bash
 cd ../client
 npm install
 ```
 
 Required frontend dependencies:
+
 ```bash
-npm install react-router-dom axios tailwindcss @headlessui/react
+npm install 
 ```
 
-## Database Setup
+Create a `.env` file in the client directory:
 
-Ensure your MySQL database is running and accessible. The application uses the following tables:
-- employee
-- customer
-- transaction
-- item
-- food_item
-
-(Database schema is provided in separate SQL files)
+```env
+REACT_APP_API_URL=http://localhost:5000
+```
 
 ## Running the Application
 
-1. Start the backend server:
+Start the backend server:
+
 ```bash
 cd server
 npm start
 # Server will run on http://localhost:5000
 ```
 
-2. In a new terminal, start the frontend application:
+Start the frontend application:
+
 ```bash
 cd client
 npm start
 # Client will run on http://localhost:3000
 ```
 
-## Login Information
-
-### Admin Login
-- Use employee credentials:
-  - First Name
-  - Last Name
-  - Employee ID
-
-### Customer Login
-- Use phone number registered in the customer database
-
-## Available Scripts
-
-In the server directory:
-```bash
-npm start           # Start the server with nodemon
-npm run start:prod  # Start the server in production mode
-```
-
-In the client directory:
-```bash
-npm start   # Start the React development server
-npm build   # Create a production build
-npm test    # Run tests
-```
-
-## Environment Variables
-
-### Backend (.env)
-```env
-MYSQL_HOST - MySQL database host
-MYSQL_USER - MySQL database user
-MYSQL_PASSWORD - MySQL database password
-MYSQL_DATABASE - MySQL database name
-MYSQL_PORT - MySQL database port
-JWT_SECRET - Secret key for JWT tokens
-```
-
 ## API Endpoints
 
 ### Authentication
-- POST `/auth/admin/login` - Admin login
+
+- POST `/auth/admin/login` - Employee login
 - POST `/auth/customer/login` - Customer login
 
-### Employees
-- GET `/employee` - Get all employees
-- GET `/employee/:id` - Get employee by ID
+### Shop
 
-### Customers
-- GET `/customer` - Get all customers
-- GET `/customer/:id` - Get customer by ID
+- GET `/shop/all-flavors` - Get all ice cream flavors
+- GET `/shop/all-flavors/:id` - Get specific flavor details
+
+### Customer Account
+
+- GET `/acc/customer/account` - Get customer account details
+- PUT `/acc/customer/account` - Update customer information
+- GET `/acc/customer/orders` - Get customer order history
+
+## Deployment
+
+### Backend (Vercel)
+
+Create vercel.json:
+
+```json
+{
+  "version": 2,
+  "builds": [{"src": "server.js", "use": "@vercel/node"}],
+  "routes": [{
+    "src": "/(.*)",
+    "dest": "server.js",
+    "headers": {
+      "Access-Control-Allow-Origin": "https://dbms-cosc-3380client.vercel.app/"
+    }
+  }]
+}
+```
+
+### Frontend (Vercel)
+
+1. Update environment variables in Vercel dashboard
+2. Configure build settings
+3. Deploy from GitHub repository
 
 ## Common Issues & Troubleshooting
 
-1. Database Connection Issues
-   - Verify database credentials in .env file
-   - Ensure MySQL server is running
-   - Check if port is accessible
+1. CORS Issues
+   - Check CORS configuration in server.js
+   - Verify frontend URL in backend CORS settings
+   - Ensure proper headers in requests
 
-2. Frontend Connection Issues
-   - Verify backend URL in frontend configuration
-   - Check if CORS is properly configured
+2. Authentication Issues
+   - Check token in localStorage
+   - Verify token format in API requests
+   - Confirm JWT_SECRET matches between environments
 
-3. Login Issues
-   - Verify employee/customer data exists in database
-   - Check console for detailed error messages
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+3. Database Connection
+   - Verify database credentials
+   - Check SSL configuration
+   - Ensure proper port access
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE.md file for details
+This project is part of the COSC 3380 course at the University of Houston.
