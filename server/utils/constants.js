@@ -7,32 +7,20 @@ const SHOP_ERRORS = {
     DELETE_ERROR: 'Error deleting item'
 };
 
-// Shop item constants
-const validateFoodItem = (item) => {
-    const requiredFields = [
-        'Item_Name',
-        'Unit_Price',
-        'Calories',
-        'Protein',
-        'Sugar',
-        'Total_Carbs',
-        'Total_Fat'
-    ];
+const AUTH_ERRORS = {
+    INVALID_CREDENTIALS: 'Invalid credentials',
+    ADMIN_ACCESS_REQUIRED: 'Admin access required',
+};
 
-    // Check fields
-    const missingFields = requiredFields.filter(field => !item[field]);
-    
-    if (missingFields.length > 0) {
-        throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
-    }
-
-    // Price can't be below 0 bussiness rule
-    if (item.Unit_Price < 0) {
-        throw new Error('Price cannot be negative');
-    }
+const CUSTOMER_ERRORS = {
+    NOT_FOUND: 'Customer not found',
+    ACCESS_DENIED: 'Access denied',
+    UPDATE_ERROR: 'Error updating customer information',
+    INVALID_ROLE: 'Invalid user role'
 };
 
 module.exports = {
     SHOP_ERRORS,
-    validateFoodItem
+    AUTH_ERRORS,
+    CUSTOMER_ERRORS
 };

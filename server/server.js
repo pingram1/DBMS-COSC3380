@@ -25,7 +25,6 @@ app.use(cors({
 app.use(express.json());
 
 // Routers
-const employeeRouter = require('./routes/employee');
 const authRouter = require('./routes/auth');
 const shopRoutes = require('./routes/shop');
 const customerRouter = require('./routes/customers');
@@ -33,7 +32,6 @@ const customerRouter = require('./routes/customers');
 // Use Routes
 app.use('/shop', shopRoutes);
 app.use('/auth', authRouter);
-app.use('/employee', employeeRouter);
 app.use('/acc', customerRouter);
 
 // Error handling middleware

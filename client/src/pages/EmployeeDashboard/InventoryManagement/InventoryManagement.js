@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { api } from '../../../api';
+import api from '../../../api';
 
-const InventoryManagement = () => {
+function InventoryManagement() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,11 +19,14 @@ const InventoryManagement = () => {
   // Fetch all items
   const fetchItems = async () => {
     try {
-      const response = await api.get('/shop/all-flavors');
+      const token = localStorage.getItem('token');
+      const response = await api.get('api/shop/all-flavors', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setItems(response.data);
       setLoading(false);
     } catch (err) {
-      setError(err.message || 'Error loading items');
+      setError('Error loading items');
       setLoading(false);
     }
   };
@@ -36,7 +39,10 @@ const InventoryManagement = () => {
   const handleAddItem = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/shop/all-flavors', newItem);
+      const token = localStorage.getItem('token');
+      await api.post('api/shop/all-flavors', newItem, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       fetchItems();
       setNewItem({
         Item_Name: '',
@@ -48,7 +54,7 @@ const InventoryManagement = () => {
         Total_Fat: ''
       });
     } catch (err) {
-      setError(err.message || 'Error adding item');
+      setError('Error adding item');
     }
   };
 
@@ -93,25 +99,50 @@ const InventoryManagement = () => {
       <div>
         <h2>Add New Item</h2>
         <form onSubmit={handleAddItem}>
-          <input
-            type="text"
-            placeholder="Item Name"
-            value={newItem.Item_Name}
-            onChange={(e) => setNewItem({...newItem, Item_Name: e.target.value})}
-          />
-          <input
-            type="number"
-            placeholder="Price"
-            value={newItem.Unit_Price}
-            onChange={(e) => setNewItem({...newItem, Unit_Price: e.target.value})}
-          />
-          <input
-            type="number"
-            placeholder="Calories"
-            value={newItem.Calories}
-            onChange={(e) => setNewItem({...newItem, Calories: e.target.value})}
-          />
-          {/* Add other fields as needed */}
+          <div>
+            <input
+              type="text"
+              placeholder="Item Name"
+              value={newItem.Item_Name}
+              onChange={(e) => setNewItem({...newItem, Item_Name: e.target.value})}
+            />
+            <input
+              type="number"
+              placeholder="Price"
+              value={newItem.Unit_Price}
+              onChange={(e) => setNewItem({...newItem, Unit_Price: e.target.value})}
+            />
+            <input
+              type="number"
+              placeholder="Calories"
+              value={newItem.Calories}
+              onChange={(e) => setNewItem({...newItem, Calories: e.target.value})}
+            />
+            <input
+              type="number"
+              placeholder="Protein (g)"
+              value={newItem.Protein}
+              onChange={(e) => setNewItem({...newItem, Protein: e.target.value})}
+            />
+            <input
+              type="number"
+              placeholder="Sugar (g)"
+              value={newItem.Sugar}
+              onChange={(e) => setNewItem({...newItem, Sugar: e.target.value})}
+            />
+            <input
+              type="number"
+              placeholder="Total Carbs (g)"
+              value={newItem.Total_Carbs}
+              onChange={(e) => setNewItem({...newItem, Total_Carbs: e.target.value})}
+            />
+            <input
+              type="number"
+              placeholder="Total Fat (g)"
+              value={newItem.Total_Fat}
+              onChange={(e) => setNewItem({...newItem, Total_Fat: e.target.value})}
+            />
+          </div>
           <button type="submit">Add Item</button>
         </form>
       </div>
@@ -119,36 +150,100 @@ const InventoryManagement = () => {
       {/* Items List */}
       <div>
         <h2>Current Inventory</h2>
-        {items.map(item => (
-          <div key={item.Item_ID}>
-            {editingItem?.Item_ID === item.Item_ID ? (
-              <form onSubmit={handleUpdateItem}>
-                <input
-                  type="text"
-                  value={editingItem.Item_Name}
-                  onChange={(e) => setEditingItem({...editingItem, Item_Name: e.target.value})}
-                />
-                <input
-                  type="number"
-                  value={editingItem.Unit_Price}
-                  onChange={(e) => setEditingItem({...editingItem, Unit_Price: e.target.value})}
-                />
-                <button type="submit">Save</button>
-                <button onClick={() => setEditingItem(null)}>Cancel</button>
-              </form>
-            ) : (
-              <div>
-                <h3>{item.Item_Name}</h3>
-                <p>Price: ${item.Unit_Price}</p>
-                <button onClick={() => setEditingItem(item)}>Edit</button>
-                <button onClick={() => handleDeleteItem(item.Item_ID)}>Delete</button>
-              </div>
-            )}
-          </div>
-        ))}
+        <table>
+          <thead>
+            <tr>
+              <th>Item Name</th>
+              <th>Price</th>
+              <th>Calories</th>
+              <th>Protein</th>
+              <th>Sugar</th>
+              <th>Total Carbs</th>
+              <th>Total Fat</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map(item => (
+              <tr key={item.Item_ID}>
+                {editingItem?.Item_ID === item.Item_ID ? (
+                  <>
+                    <td>
+                      <input
+                        type="text"
+                        value={editingItem.Item_Name}
+                        onChange={(e) => setEditingItem({...editingItem, Item_Name: e.target.value})}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        value={editingItem.Unit_Price}
+                        onChange={(e) => setEditingItem({...editingItem, Unit_Price: e.target.value})}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        value={editingItem.Calories}
+                        onChange={(e) => setEditingItem({...editingItem, Calories: e.target.value})}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        value={editingItem.Protein}
+                        onChange={(e) => setEditingItem({...editingItem, Protein: e.target.value})}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        value={editingItem.Sugar}
+                        onChange={(e) => setEditingItem({...editingItem, Sugar: e.target.value})}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        value={editingItem.Total_Carbs}
+                        onChange={(e) => setEditingItem({...editingItem, Total_Carbs: e.target.value})}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        value={editingItem.Total_Fat}
+                        onChange={(e) => setEditingItem({...editingItem, Total_Fat: e.target.value})}
+                      />
+                    </td>
+                    <td>
+                      <button onClick={handleUpdateItem}>Save</button>
+                      <button onClick={() => setEditingItem(null)}>Cancel</button>
+                    </td>
+                  </>
+                ) : (
+                  <>
+                    <td>{item.Item_Name}</td>
+                    <td>${item.Unit_Price}</td>
+                    <td>{item.Calories}</td>
+                    <td>{item.Protein}g</td>
+                    <td>{item.Sugar}g</td>
+                    <td>{item.Total_Carbs}g</td>
+                    <td>{item.Total_Fat}g</td>
+                    <td>
+                      <button onClick={() => setEditingItem(item)}>Edit</button>
+                      <button onClick={() => handleDeleteItem(item.Item_ID)}>Delete</button>
+                    </td>
+                  </>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
-};
+}
 
 export default InventoryManagement;
