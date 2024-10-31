@@ -42,7 +42,11 @@ root/
 └── server/                # Node.js backend
     ├── config/            # Database configuration
     ├── routes/           # API routes
-    ├── middlewares/      # Custom middlewares
+    ├── middlewares/      # Auth middle ware 
+    ├── models/           # SQL queries
+    ├── utils/            # reusable error constances
+    ├── controllers/      # Hooks for routes to use services
+    ├── services/         # actual funcions GET, POST, PUT
     ├── server.js         
 ```
 
