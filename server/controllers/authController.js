@@ -1,24 +1,27 @@
 const AuthService = require('../services/authService');
-const { validateEmployeeData, validateCustomerData } = require('../utils/validation');
+const { AUTH_ERRORS } = require('../utils/constants');
 
 class AuthController {
     static async adminLogin(req, res) {
         try {
-            validateEmployeeData(req.body);
             const authResult = await AuthService.adminLogin(req.body);
             res.json(authResult);
         } catch (error) {
-            throw error
+            console.error('Admin login controller error:', error);
+            res.status(401).json({ 
+                error: error.message || AUTH_ERRORS.INVALID_CREDENTIALS
+            });
         }
     }
 
     static async customerLogin(req, res) {
         try {
-            validateCustomerData(req.body);
             const authResult = await AuthService.customerLogin(req.body.phoneNumber);
             res.json(authResult);
         } catch (error) {
-            throw error
+            res.status(401).json({ 
+                error: error.message || AUTH_ERRORS.INVALID_CREDENTIALS
+            });
         }
     }
 }

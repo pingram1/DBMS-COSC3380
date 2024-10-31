@@ -41,7 +41,6 @@ class AuthService {
                 }
             };
         } catch (error) {
-            console.error('Admin login error:', error);
             throw error;
         }
     }
@@ -70,7 +69,6 @@ class AuthService {
                 }
             };
         } catch (error) {
-            console.error('Customer login error:', error);
             throw error;
         }
     }

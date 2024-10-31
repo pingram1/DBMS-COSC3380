@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import api from '../../../api';
+import { shopService } from '../../../api';
 
 function InventoryManagement() {
   const [items, setItems] = useState([]);
@@ -19,14 +19,12 @@ function InventoryManagement() {
   // Fetch all items
   const fetchItems = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await api.get('api/shop/all-flavors', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setItems(response.data);
-      setLoading(false);
+      const data = await shopService.getAllFlavors();
+      setItems(data);
+      setError(null);
     } catch (err) {
-      setError('Error loading items');
+      setError(err.message || 'Error loading items');
+    } finally {
       setLoading(false);
     }
   };
@@ -39,11 +37,8 @@ function InventoryManagement() {
   const handleAddItem = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
-      await api.post('api/shop/all-flavors', newItem, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      fetchItems();
+      await shopService.createFlavor(newItem);
+      await fetchItems();
       setNewItem({
         Item_Name: '',
         Unit_Price: '',
@@ -53,8 +48,9 @@ function InventoryManagement() {
         Total_Carbs: '',
         Total_Fat: ''
       });
+      setError(null);
     } catch (err) {
-      setError('Error adding item');
+      setError(err.message || 'Error adding item');
     }
   };
 
@@ -62,14 +58,12 @@ function InventoryManagement() {
   const handleUpdateItem = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
-      await api.put(`api/shop/all-flavors/${editingItem.Item_ID}`, editingItem, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      fetchItems();
+      await shopService.updateFlavor(editingItem.Item_ID, editingItem);
+      await fetchItems();
       setEditingItem(null);
+      setError(null);
     } catch (err) {
-      setError('Error updating item');
+      setError(err.message || 'Error updating item');
     }
   };
 
@@ -77,23 +71,22 @@ function InventoryManagement() {
   const handleDeleteItem = async (itemId) => {
     if (window.confirm('Are you sure you want to delete this item?')) {
       try {
-        const token = localStorage.getItem('token');
-        await api.delete(`api/shop/all-flavors/${itemId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        fetchItems();
+        await shopService.deleteFlavor(itemId);
+        await fetchItems();
+        setError(null);
       } catch (err) {
-        setError('Error deleting item');
+        setError(err.message || 'Error deleting item');
       }
     }
   };
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>{error}</div>;
 
   return (
     <div>
       <h1>Inventory Management</h1>
+      
+      {error && <div role="alert">{error}</div>}
 
       {/* Add New Item Form */}
       <div>

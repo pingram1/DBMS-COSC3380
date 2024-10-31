@@ -1,5 +1,5 @@
 const ShopService = require('../services/shopService');
-const { SHOP_ERRORS, validateFoodItem } = require('../utils/constants');
+const { SHOP_ERRORS } = require('../utils/constants');
 
 class ShopController {
     static async getAllFlavors(req, res) {
@@ -27,7 +27,6 @@ class ShopController {
 
     static async createFlavor(req, res) {
         try {
-            validateFoodItem(req.body);
             const itemId = await ShopService.createFoodItem(req.body);
             
             res.status(201).json({

@@ -18,5 +18,32 @@ export const shopService = {
     } catch (error) {
       throw error;
     }
+  },
+
+  createFlavor: async (flavorData) => {
+    try {
+      const response = await api.post(API_CONFIG.ENDPOINTS.SHOP.FLAVORS, flavorData);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  updateFlavor: async (id, flavorData) => {
+    try {
+      const response = await api.put(`${API_CONFIG.ENDPOINTS.SHOP.FLAVORS}/${id}`, flavorData);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  deleteFlavor: async (id) => {
+    try {
+      const response = await api.delete(`${API_CONFIG.ENDPOINTS.SHOP.FLAVORS}/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 };
