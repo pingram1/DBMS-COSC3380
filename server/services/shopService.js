@@ -28,7 +28,7 @@ class ShopService {
             
             return rows[0];
         } catch (error) {
-            console.error(`Error in getItemById for ID ${id}:`, error);
+            console.error('Error in getItemById for ID %s:', id, error);
             throw error;
         }
     }
