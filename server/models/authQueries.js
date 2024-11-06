@@ -12,6 +12,6 @@ const authQueries = {
     `
 };
 
-module.exports = {
+export default {
     authQueries
 };

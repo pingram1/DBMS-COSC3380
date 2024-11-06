@@ -75,7 +75,13 @@ function InventoryManagement() {
         await fetchItems();
         setError(null);
       } catch (err) {
-        setError(err.message || 'Error deleting item');
+        if (err.status === 404) {
+          setError('Item not found. It may have been already deleted.');
+          // Refresh the list to ensure UI is in sync
+          fetchItems();
+        } else {
+          setError(err.message || 'Error deleting item');
+        }
       }
     }
   };

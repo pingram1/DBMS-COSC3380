@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { pool } = require('../config/db');
 const { AUTH_ERRORS } = require('../utils/constants');
-const { authQueries } = require('../models/authQueries');
+const { authQueries } = require('../models/authQueries').default;
 
 class AuthService {
     static generateToken(user, role) {
