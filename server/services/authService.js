@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { pool } = require('../config/db');
 const { AUTH_ERRORS } = require('../utils/constants');
-const { authQueries } = require('../models/authQueries').default;
+const { authQueries } = require('../models/authQueries');
 
 class AuthService {
     static generateToken(user, role) {
@@ -38,6 +38,34 @@ class AuthService {
                     firstName: employee.First_Name,
                     lastName: employee.Last_Name,
                     role: 'admin'
+                }
+            };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async employeeLogin(credentials) {
+        try {
+            const [employees] = await pool.query(
+                authQueries.getEmployeeByCredentials,
+                [credentials.employeeId, credentials.firstName, credentials.lastName]
+            );
+
+            if (employees.length === 0) {
+                throw new Error(AUTH_ERRORS.INVALID_CREDENTIALS);
+            }
+
+            const employee = employees[0];
+            const token = this.generateToken(employee, 'employee');
+
+            return {
+                token,
+                user: {
+                    id: employee.Employee_ID,
+                    firstName: employee.First_Name,
+                    lastName: employee.Last_Name,
+                    role: 'employee'
                 }
             };
         } catch (error) {

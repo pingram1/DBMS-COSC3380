@@ -5,6 +5,13 @@ const authQueries = {
         AND First_Name = ? 
         AND Last_Name = ?
     `,
+
+    getAdminByCredentials: `
+        SELECT * FROM admin
+        WHERE Admin_ID = ?
+        AND name = ?
+        AND password = ?
+    `,
     
     getCustomerByPhone: `
         SELECT * FROM customer 
@@ -12,6 +19,6 @@ const authQueries = {
     `
 };
 
-export default {
+module.exports = {
     authQueries
 };
