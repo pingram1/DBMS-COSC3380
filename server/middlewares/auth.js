@@ -16,12 +16,20 @@ const authMiddleware = (req, res, next) => {
     }
 };
 
-// Middleware to check if user is admin
+// Middleware to check if user is admin or employee
 const isAdmin = (req, res, next) => {
+    if (req.user.role !== 'admin' && req.user.role !== 'employee') {
+        return res.status(403).json({ error: 'Admin/Employee access required' });
+    }
+    next();
+};
+
+// Middleware to check if user is admin 
+const isStrictAdmin = (req, res, next) => {
     if (req.user.role !== 'admin') {
         return res.status(403).json({ error: 'Admin access required' });
     }
     next();
 };
 
-module.exports = { authMiddleware, isAdmin };
+module.exports = { authMiddleware, isAdmin, isStrictAdmin };

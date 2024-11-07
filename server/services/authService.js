@@ -5,38 +5,47 @@ const { authQueries } = require('../models/authQueries');
 
 class AuthService {
     static generateToken(user, role) {
+        const payload = {
+            id: role === 'admin' ? user.Admin_ID : 
+                role === 'employee' ? user.Employee_ID : 
+                user.Customer_ID,
+            firstName: user.First_Name,
+            lastName: user.Last_Name,
+            role: role
+        };
+
+        if (role === 'admin') {
+            payload.username = user.Username;
+        }
+
         return jwt.sign(
-            {
-                id: role === 'admin' ? user.Employee_ID : user.Customer_ID,
-                firstName: user.First_Name,
-                lastName: user.Last_Name,
-                role: role
-            },
+            payload,
             process.env.JWT_SECRET,
-            { expiresIn: role === 'admin' ? '8h' : '24h' }
+            { expiresIn: role === 'customer' ? '24h' : '8h' }
         );
     }
 
     static async adminLogin(credentials) {
         try {
-            const [employees] = await pool.query(
-                authQueries.getEmployeeByCredentials,
-                [credentials.employeeId, credentials.firstName, credentials.lastName]
+            const [admins] = await pool.query(
+                authQueries.getAdminByCredentials,
+                [credentials.username, credentials.password] // In production, use proper password hashing
             );
 
-            if (employees.length === 0) {
+            if (admins.length === 0) {
                 throw new Error(AUTH_ERRORS.INVALID_CREDENTIALS);
             }
 
-            const employee = employees[0];
-            const token = this.generateToken(employee, 'admin');
+            const admin = admins[0];
+            const token = this.generateToken(admin, 'admin');
 
             return {
                 token,
                 user: {
-                    id: employee.Employee_ID,
-                    firstName: employee.First_Name,
-                    lastName: employee.Last_Name,
+                    id: admin.Admin_ID,
+                    firstName: admin.First_Name,
+                    lastName: admin.Last_Name,
+                    username: admin.Username,
                     role: 'admin'
                 }
             };

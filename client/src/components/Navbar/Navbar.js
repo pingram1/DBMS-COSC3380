@@ -59,8 +59,25 @@ const Navbar = () => {
           <div>
             <Link to="/">Home</Link>
             <Link to="/admin/dashboard">Manage Products</Link>
-            <Link to="/vendors">Vendors</Link>
+            <Link to="/employeeM">Vendors</Link>
             <Link to="/reports">Reports</Link>
+            <button onClick={handleLogout}>Logout</button>
+          </div>
+        </div>
+      </nav>
+    );
+  }
+
+  // Employee Navigation
+  if (userRole === 'employee') {
+    return (
+      <nav>
+        <div>
+          <Link to="/">Ice Cream Shop</Link>
+
+          <div>
+            <Link to="/">Home</Link>
+            <Link to="/employee/dashboard">Manage Products</Link>
             <button onClick={handleLogout}>Logout</button>
           </div>
         </div>

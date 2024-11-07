@@ -5,6 +5,8 @@ import { authService } from '../../api';
 const Login = () => {
   const [loginType, setLoginType] = useState('customer');
   const [formData, setFormData] = useState({
+    username: '',
+    password: '',
     firstName: '',
     lastName: '',
     employeeId: '',
@@ -27,35 +29,53 @@ const Login = () => {
     try {
       let response;
       
-      if (loginType === 'admin') {
-        const adminCredentials = {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          employeeId: formData.employeeId
-        };
-        response = await authService.adminLogin(adminCredentials);
-      } else {
-        response = await authService.customerLogin(formData.phoneNumber);
+      switch(loginType) {
+        case 'admin':
+          response = await authService.adminLogin({
+            username: formData.username,
+            password: formData.password
+          });
+          break;
+        
+        case 'employee':
+          response = await authService.employeeLogin({
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            employeeId: formData.employeeId
+          });
+          break;
+        
+        case 'customer':
+          response = await authService.customerLogin(formData.phoneNumber);
+          break;
+
+        default:
+          setError('Invalid login type');
+          return;
       }
       
-      // Properly access the nested data structure
       if (response?.data?.token) {
-        // Store token and user role
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('userRole', response.data.user.role);
         
-        // Redirect based on role
-        if (response.data.user.role === 'admin') {
-          navigate('/admin/dashboard');
-        } else {
-          navigate('/customer/dashboard');
+        switch(response.data.user.role) {
+          case 'admin':
+            navigate('/admin/dashboard');
+            break;
+          case 'employee':
+            navigate('/employee/dashboard');
+            break;
+          case 'customer':
+            navigate('/customer/dashboard');
+            break;
+          default:
+            setError('Invalid user role');
         }
       } else {
         setError('Invalid response from server');
       }
     } catch (err) {
       console.error('Login error:', err);
-      // More specific error handling
       if (err.response?.status === 401) {
         setError('Invalid credentials. Please try again.');
       } else if (err.response?.data?.error) {
@@ -66,110 +86,130 @@ const Login = () => {
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Ice Cream Shop Login
-          </h2>
-          <div className="mt-4 flex justify-center space-x-4">
-            <button
-              type="button"
-              onClick={() => setLoginType('customer')}
-              className={`px-4 py-2 rounded-md ${
-                loginType === 'customer'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700'
-              }`}
-            >
-              Customer
-            </button>
-            <button
-              type="button"
-              onClick={() => setLoginType('admin')}
-              className={`px-4 py-2 rounded-md ${
-                loginType === 'admin'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700'
-              }`}
-            >
-              Employee
-            </button>
-          </div>
-        </div>
-
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="text-sm text-red-700">{error}</div>
-            </div>
-          )}
-
-          {loginType === 'admin' ? (
-            // Admin Login Form
-            <div className="rounded-md shadow-sm -space-y-px">
-              <div>
-                <input
-                  name="firstName"
-                  type="text"
-                  required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                  placeholder="First Name"
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <input
-                  name="lastName"
-                  type="text"
-                  required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                  placeholder="Last Name"
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <input
-                  name="employeeId"
-                  type="text"
-                  required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                  placeholder="Employee ID"
-                  value={formData.employeeId}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
-          ) : (
-            // Customer Login Form
-            <div className="rounded-md shadow-sm">
-              <div>
-                <input
-                  name="phoneNumber"
-                  type="tel"
-                  required
-                  className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                  placeholder="Phone Number"
-                  value={formData.phoneNumber}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
-          )}
-
+  const renderLoginForm = () => {
+    switch(loginType) {
+      case 'admin':
+        return (
           <div>
-            <button
-              type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Sign in
-            </button>
+            <div>
+              <input
+                name="username"
+                type="text"
+                required
+                placeholder="Username"
+                value={formData.username}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <input
+                name="password"
+                type="password"
+                required
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleInputChange}
+              />
+            </div>
           </div>
-        </form>
+        );
+
+      case 'employee':
+        return (
+          <div>
+            <div>
+              <input
+                name="firstName"
+                type="text"
+                required
+                placeholder="First Name"
+                value={formData.firstName}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <input
+                name="lastName"
+                type="text"
+                required
+                placeholder="Last Name"
+                value={formData.lastName}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <input
+                name="employeeId"
+                type="text"
+                required
+                placeholder="Employee ID"
+                value={formData.employeeId}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
+        );
+
+      case 'customer':
+        return (
+          <div>
+            <input
+              name="phoneNumber"
+              type="tel"
+              required
+              placeholder="Phone Number"
+              value={formData.phoneNumber}
+              onChange={handleInputChange}
+            />
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div>
+      <div>
+        <h2>Ice Cream Shop Login</h2>
+        <div>
+          <button
+            type="button"
+            onClick={() => setLoginType('customer')}
+          >
+            Customer
+          </button>
+          <button
+            type="button"
+            onClick={() => setLoginType('employee')}
+          >
+            Employee
+          </button>
+          <button
+            type="button"
+            onClick={() => setLoginType('admin')}
+          >
+            Admin
+          </button>
+        </div>
       </div>
+
+      <form onSubmit={handleSubmit}>
+        {error && (
+          <div>
+            <div>{error}</div>
+          </div>
+        )}
+
+        {renderLoginForm()}
+
+        <div>
+          <button type="submit">
+            Sign in
+          </button>
+        </div>
+      </form>
     </div>
   );
 };

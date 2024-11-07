@@ -9,7 +9,11 @@ const SHOP_ERRORS = {
 
 const AUTH_ERRORS = {
     INVALID_CREDENTIALS: 'Invalid credentials',
+    TOKEN_REQUIRED: 'Authentication required',
+    TOKEN_INVALID: 'Invalid token',
     ADMIN_ACCESS_REQUIRED: 'Admin access required',
+    EMPLOYEE_ACCESS_REQUIRED: 'Employee access required',
+    SERVER_ERROR: 'Server error during authentication'
 };
 
 const CUSTOMER_ERRORS = {

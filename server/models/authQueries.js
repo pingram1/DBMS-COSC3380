@@ -8,9 +8,8 @@ const authQueries = {
 
     getAdminByCredentials: `
         SELECT * FROM admin
-        WHERE Admin_ID = ?
-        AND name = ?
-        AND password = ?
+        WHERE Username = ?
+        AND Password = ?
     `,
     
     getCustomerByPhone: `
