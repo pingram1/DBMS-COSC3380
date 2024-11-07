@@ -41,6 +41,38 @@ class ShopController {
             }
         }
     }
+
+    static async updateFlavor(req, res) {
+        try {
+            await ShopService.updateFoodItem(req.params.id, req.body);
+            
+            res.status(201).json({
+                message: 'Food item update successfully'
+            });
+        } catch (error) {
+            if (error.message === SHOP_ERRORS.ITEM_NOT_FOUND) {
+                res.status(404).json({ error: error.message });
+            } else {
+                res.status(500).json({ error: error.message });
+            }
+        }
+    }
+
+    static async deleteFlavor(req, res) {
+        try {
+            await ShopService.deleteFoodItem(req.params.id, req.body);
+            
+            res.status(201).json({
+                message: 'Food item delete successfully'
+            });
+        } catch (error) {
+            if (error.message === SHOP_ERRORS.ITEM_NOT_FOUND) {
+                res.status(404).json({ error: error.message });
+            } else {
+                res.status(500).json({ error: error.message });
+            }
+        }
+    }
 }
 
 module.exports = ShopController;

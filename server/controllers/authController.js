@@ -7,12 +7,22 @@ class AuthController {
             const authResult = await AuthService.adminLogin(req.body);
             res.json(authResult);
         } catch (error) {
-            console.error('Admin login controller error:', error);
             res.status(401).json({ 
                 error: error.message || AUTH_ERRORS.INVALID_CREDENTIALS
             });
         }
     }
+
+    static async employeeLogin(req, res) {
+        try {
+            const authResult = await AuthService.employeeLogin(req.body);
+            res.json(authResult);
+        } catch (error) {
+            res.status(401).json({ 
+                error: error.message || AUTH_ERRORS.INVALID_CREDENTIALS
+            });
+        }
+    }    
 
     static async customerLogin(req, res) {
         try {

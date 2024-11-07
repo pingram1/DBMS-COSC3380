@@ -5,6 +5,12 @@ const authQueries = {
         AND First_Name = ? 
         AND Last_Name = ?
     `,
+
+    getAdminByCredentials: `
+        SELECT * FROM admin
+        WHERE Username = ?
+        AND Password = ?
+    `,
     
     getCustomerByPhone: `
         SELECT * FROM customer 

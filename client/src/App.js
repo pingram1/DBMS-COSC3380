@@ -40,6 +40,16 @@ function App() {
               </ProtectedRoute>
             } 
           />
+
+          {/* Employee Routes */}
+          <Route 
+            path="/employee/dashboard" 
+            element={
+              <ProtectedRoute allowedRole="employee">
+                <InventoryManagement />
+              </ProtectedRoute>
+            } 
+          />
           
           {/* Admin Routes */}
           <Route 

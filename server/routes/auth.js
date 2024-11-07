@@ -12,6 +12,7 @@ const customerLoginLimiter = rateLimit({
 });
 
 router.post('/admin/login', adminLoginLimiter, AuthController.adminLogin);
-router.post('/customer/login', customerLoginLimiter, AuthController.customerLogin);
+router.post('/employee/login', adminLoginLimiter, AuthController.employeeLogin);
+router.post('/customer/login', AuthController.customerLogin);
 
 module.exports = router;

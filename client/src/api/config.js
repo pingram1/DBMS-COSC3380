@@ -5,7 +5,9 @@ const API_CONFIG = {
     ENDPOINTS: {
       AUTH: {
         CUSTOMER_LOGIN: '/auth/customer/login',
-        ADMIN_LOGIN: '/auth/admin/login'
+        ADMIN_LOGIN: '/auth/admin/login',
+        EMPLOYEE_LOGIN: '/auth/employee/login'
+
       },
       CUSTOMER: {
         ACCOUNT: '/acc/customer/account'
