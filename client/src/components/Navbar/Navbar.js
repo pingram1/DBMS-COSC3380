@@ -1,5 +1,5 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import '../Navbar/Navbar.css';
+import './Navbar.css';
 
 const Navbar = () => {
   const userRole = localStorage.getItem('userRole');
