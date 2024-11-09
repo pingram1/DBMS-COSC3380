@@ -5,13 +5,17 @@ const API_CONFIG = {
     ENDPOINTS: {
       AUTH: {
         CUSTOMER_LOGIN: '/auth/customer/login',
-        ADMIN_LOGIN: '/auth/admin/login'
+        ADMIN_LOGIN: '/auth/admin/login',
+        EMPLOYEE_LOGIN: '/auth/employee/login'
+
       },
       CUSTOMER: {
-        ACCOUNT: '/acc/customer/account'
+        ACCOUNT: '/acc/customer/account',
+        ORDERS: '/acc/customer/orders'
       },
       SHOP: {
-        FLAVORS: '/shop/all-flavors'
+        FLAVORS: '/shop/all-flavors',
+        INVENTORY_LOGS: '/shop/inventory-logs'
       }
     },
     HEADERS: {

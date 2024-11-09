@@ -1,22 +1,25 @@
 import { useState, useEffect } from 'react';
 import { shopService } from '../../../api';
+import styles from './InventoryManagement.css';
 
 function InventoryManagement() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editingItem, setEditingItem] = useState(null);
+  const [confirmQuantity, setConfirmQuantity] = useState(null);
   const [newItem, setNewItem] = useState({
     Item_Name: '',
     Unit_Price: '',
+    Quantity: '',
     Calories: '',
     Protein: '',
     Sugar: '',
     Total_Carbs: '',
     Total_Fat: ''
   });
+  const [inventoryLogs, setInventoryLogs] = useState([]);
 
-  // Fetch all items
   const fetchItems = async () => {
     try {
       const data = await shopService.getAllFlavors();
@@ -29,11 +32,22 @@ function InventoryManagement() {
     }
   };
 
+  const fetchInventoryLogs = async () => {
+    try {
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - 30);
+      const logs = await shopService.getInventoryLogs(startDate, new Date());
+      setInventoryLogs(logs);
+    } catch (err) {
+      console.error('Error fetching inventory logs:', err);
+    }
+  };
+
   useEffect(() => {
     fetchItems();
+    fetchInventoryLogs();
   }, []);
 
-  // Add new item
   const handleAddItem = async (e) => {
     e.preventDefault();
     try {
@@ -42,6 +56,7 @@ function InventoryManagement() {
       setNewItem({
         Item_Name: '',
         Unit_Price: '',
+        Quantity: '',
         Calories: '',
         Protein: '',
         Sugar: '',
@@ -54,7 +69,6 @@ function InventoryManagement() {
     }
   };
 
-  // Update item
   const handleUpdateItem = async (e) => {
     e.preventDefault();
     try {
@@ -67,7 +81,6 @@ function InventoryManagement() {
     }
   };
 
-  // Delete item
   const handleDeleteItem = async (itemId) => {
     if (window.confirm('Are you sure you want to delete this item?')) {
       try {
@@ -75,79 +88,160 @@ function InventoryManagement() {
         await fetchItems();
         setError(null);
       } catch (err) {
-        setError(err.message || 'Error deleting item');
+        if (err.status === 404) {
+          setError('Item not found. It may have been already deleted.');
+          fetchItems();
+        } else {
+          setError(err.message || 'Error deleting item');
+        }
       }
     }
+  };
+
+  const handleQuantityChange = async (itemId, newQuantity) => {
+    try {
+      // Get user role from localStorage
+      const userRole = localStorage.getItem('userRole');
+      await shopService.updateQuantity(itemId, parseInt(newQuantity), userRole);
+      await fetchItems();
+      await fetchInventoryLogs();
+      setError(null);
+    } catch (err) {
+      setError(err.message || 'Error updating quantity');
+    }
+  };
+
+  const handleApplyQuantity = (itemId, newQuantity, currentQuantity) => {
+    // Convert to numbers and handle NaN
+    const newQty = parseInt(newQuantity) || 0;
+    const currentQty = parseInt(currentQuantity) || 0;
+    const quantityDiff = Math.abs(newQty - currentQty);
+    
+    if (quantityDiff > 10) {
+      setConfirmQuantity({
+        itemId,
+        quantity: newQty,
+        currentQuantity: currentQty
+      });
+    } else {
+      handleQuantityChange(itemId, newQty);
+    }
+  };
+
+  const QuantityConfirmationModal = ({ onConfirm, onCancel, data }) => {
+    if (!data) return null;
+
+    return (
+      <div className={styles.modalOverlay}>
+        <div className={styles.modal}>
+          <h3>Confirm Quantity Change</h3>
+          <p>Are you sure you want to change the quantity from {data.currentQuantity} to {data.quantity}?</p>
+          <p>This is a change of {Math.abs(data.quantity - data.currentQuantity)} units.</p>
+          <div className={styles.modalButtons}>
+            <button 
+              onClick={() => {
+                onConfirm(data.itemId, data.quantity);
+                onCancel();
+              }}
+              className={styles.confirmButton}
+            >
+              Confirm
+            </button>
+            <button 
+              onClick={onCancel}
+              className={styles.cancelButton}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div>
+    <div className={styles.container}>
       <h1>Inventory Management</h1>
       
-      {error && <div role="alert">{error}</div>}
+      {error && <div className={styles.errorAlert} role="alert">{error}</div>}
 
       {/* Add New Item Form */}
-      <div>
+      <div className={styles.formSection}>
         <h2>Add New Item</h2>
-        <form onSubmit={handleAddItem}>
-          <div>
+        <form onSubmit={handleAddItem} className={styles.form}>
+          <div className={styles.formGrid}>
             <input
               type="text"
               placeholder="Item Name"
               value={newItem.Item_Name}
               onChange={(e) => setNewItem({...newItem, Item_Name: e.target.value})}
+              className={styles.input}
             />
             <input
               type="number"
               placeholder="Price"
               value={newItem.Unit_Price}
               onChange={(e) => setNewItem({...newItem, Unit_Price: e.target.value})}
+              className={styles.input}
+            />
+            <input
+              type="number"
+              placeholder="Initial Quantity"
+              value={newItem.Quantity}
+              onChange={(e) => setNewItem({...newItem, Quantity: e.target.value})}
+              className={styles.input}
             />
             <input
               type="number"
               placeholder="Calories"
               value={newItem.Calories}
               onChange={(e) => setNewItem({...newItem, Calories: e.target.value})}
+              className={styles.input}
             />
             <input
               type="number"
               placeholder="Protein (g)"
               value={newItem.Protein}
               onChange={(e) => setNewItem({...newItem, Protein: e.target.value})}
+              className={styles.input}
             />
             <input
               type="number"
               placeholder="Sugar (g)"
               value={newItem.Sugar}
               onChange={(e) => setNewItem({...newItem, Sugar: e.target.value})}
+              className={styles.input}
             />
             <input
               type="number"
               placeholder="Total Carbs (g)"
               value={newItem.Total_Carbs}
               onChange={(e) => setNewItem({...newItem, Total_Carbs: e.target.value})}
+              className={styles.input}
             />
             <input
               type="number"
               placeholder="Total Fat (g)"
               value={newItem.Total_Fat}
               onChange={(e) => setNewItem({...newItem, Total_Fat: e.target.value})}
+              className={styles.input}
             />
           </div>
-          <button type="submit">Add Item</button>
+          <button type="submit" className={styles.submitButton}>Add Item</button>
         </form>
       </div>
 
       {/* Items List */}
-      <div>
+      <div className={styles.tableSection}>
         <h2>Current Inventory</h2>
-        <table>
+        <table className={styles.table}>
           <thead>
             <tr>
               <th>Item Name</th>
               <th>Price</th>
+              <th>Quantity</th>
               <th>Calories</th>
               <th>Protein</th>
               <th>Sugar</th>
@@ -158,7 +252,7 @@ function InventoryManagement() {
           </thead>
           <tbody>
             {items.map(item => (
-              <tr key={item.Item_ID}>
+              <tr key={item.Item_ID} className={item.LowStock ? styles.lowStock : ''}>
                 {editingItem?.Item_ID === item.Item_ID ? (
                   <>
                     <td>
@@ -166,6 +260,7 @@ function InventoryManagement() {
                         type="text"
                         value={editingItem.Item_Name}
                         onChange={(e) => setEditingItem({...editingItem, Item_Name: e.target.value})}
+                        className={styles.input}
                       />
                     </td>
                     <td>
@@ -173,13 +268,49 @@ function InventoryManagement() {
                         type="number"
                         value={editingItem.Unit_Price}
                         onChange={(e) => setEditingItem({...editingItem, Unit_Price: e.target.value})}
+                        className={styles.input}
                       />
+                    </td>
+                    <td className={styles.quantityCell}>
+                      <div className={styles.quantityControl}>
+                        <input
+                          type="number"
+                          min="0"
+                          value={item.Quantity || 0}  // Add default value of 0
+                          onChange={(e) => {
+                            const newValue = parseInt(e.target.value) || 0;  // Parse as integer
+                            const newItems = items.map(i => 
+                              i.Item_ID === item.Item_ID 
+                                ? { ...i, Quantity: newValue }
+                                : i
+                            );
+                            setItems(newItems);
+                          }}
+                          className={`${styles.quantityInput} ${item.LowStock ? styles.lowStock : ''}`}
+                        />
+                        <button 
+                          onClick={() => handleApplyQuantity(
+                            item.Item_ID, 
+                            parseInt(items.find(i => i.Item_ID === item.Item_ID).Quantity) || 0,
+                            parseInt(item.Quantity) || 0
+                          )}
+                          className={styles.applyButton}
+                        >
+                          Apply
+                        </button>
+                      </div>
+                      {item.LowStock && (
+                        <span className={styles.lowStockWarning}>
+                          Low Stock!
+                        </span>
+                      )}
                     </td>
                     <td>
                       <input
                         type="number"
                         value={editingItem.Calories}
                         onChange={(e) => setEditingItem({...editingItem, Calories: e.target.value})}
+                        className={styles.input}
                       />
                     </td>
                     <td>
@@ -187,6 +318,7 @@ function InventoryManagement() {
                         type="number"
                         value={editingItem.Protein}
                         onChange={(e) => setEditingItem({...editingItem, Protein: e.target.value})}
+                        className={styles.input}
                       />
                     </td>
                     <td>
@@ -194,6 +326,7 @@ function InventoryManagement() {
                         type="number"
                         value={editingItem.Sugar}
                         onChange={(e) => setEditingItem({...editingItem, Sugar: e.target.value})}
+                        className={styles.input}
                       />
                     </td>
                     <td>
@@ -201,6 +334,7 @@ function InventoryManagement() {
                         type="number"
                         value={editingItem.Total_Carbs}
                         onChange={(e) => setEditingItem({...editingItem, Total_Carbs: e.target.value})}
+                        className={styles.input}
                       />
                     </td>
                     <td>
@@ -208,25 +342,59 @@ function InventoryManagement() {
                         type="number"
                         value={editingItem.Total_Fat}
                         onChange={(e) => setEditingItem({...editingItem, Total_Fat: e.target.value})}
+                        className={styles.input}
                       />
                     </td>
                     <td>
-                      <button onClick={handleUpdateItem}>Save</button>
-                      <button onClick={() => setEditingItem(null)}>Cancel</button>
+                      <button onClick={handleUpdateItem} className={styles.saveButton}>Save</button>
+                      <button onClick={() => setEditingItem(null)} className={styles.cancelButton}>Cancel</button>
                     </td>
                   </>
                 ) : (
                   <>
                     <td>{item.Item_Name}</td>
                     <td>${item.Unit_Price}</td>
+                    <td className={styles.quantityCell}>
+                      <div className={styles.quantityControl}>
+                        <input
+                          type="number"
+                          min="0"
+                          value={item.Quantity}
+                          onChange={(e) => {
+                            const newItems = items.map(i => 
+                              i.Item_ID === item.Item_ID 
+                                ? { ...i, Quantity: e.target.value }
+                                : i
+                            );
+                            setItems(newItems);
+                          }}
+                          className={`${styles.quantityInput} ${item.LowStock ? styles.lowStock : ''}`}
+                        />
+                        <button 
+                          onClick={() => handleApplyQuantity(
+                            item.Item_ID, 
+                            items.find(i => i.Item_ID === item.Item_ID).Quantity,
+                            item.Quantity
+                          )}
+                          className={styles.applyButton}
+                        >
+                          Apply
+                        </button>
+                      </div>
+                      {item.LowStock && (
+                        <span className={styles.lowStockWarning}>
+                          Low Stock!
+                        </span>
+                      )}
+                    </td>
                     <td>{item.Calories}</td>
                     <td>{item.Protein}g</td>
                     <td>{item.Sugar}g</td>
                     <td>{item.Total_Carbs}g</td>
                     <td>{item.Total_Fat}g</td>
                     <td>
-                      <button onClick={() => setEditingItem(item)}>Edit</button>
-                      <button onClick={() => handleDeleteItem(item.Item_ID)}>Delete</button>
+                      <button onClick={() => setEditingItem(item)} className={styles.editButton}>Edit</button>
+                      <button onClick={() => handleDeleteItem(item.Item_ID)} className={styles.deleteButton}>Delete</button>
                     </td>
                   </>
                 )}
@@ -235,6 +403,47 @@ function InventoryManagement() {
           </tbody>
         </table>
       </div>
+
+      {/* Inventory Logs */}
+      <div className={styles.logsSection}>
+        <h2>Inventory Logs</h2>
+        {inventoryLogs.length > 0 ? (
+          <table className={styles.logsTable}>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Item</th>
+                <th>Action</th>
+                <th>Quantity Changed</th>
+                <th>New Quantity</th>
+                <th>Updated by</th>
+              </tr>
+            </thead>
+            <tbody>
+              {inventoryLogs.map(log => (
+                <tr key={log.Log_ID}>
+                  <td>{new Date(log.Action_Date).toLocaleString()}</td>
+                  <td>{log.Item_Name}</td>
+                  <td>{log.Action_Type}</td>
+                  <td>{log.Quantity_Changed >= 0 ? `+${log.Quantity_Changed}` : log.Quantity_Changed}</td>
+                  <td>{log.New_Quantity}</td>
+                  <td>{log.Action_By}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div className={styles.noLogs}>
+            No inventory changes in the last 30 days
+          </div>
+        )}
+      </div>
+
+      <QuantityConfirmationModal 
+        data={confirmQuantity}
+        onConfirm={handleQuantityChange}
+        onCancel={() => setConfirmQuantity(null)}
+      />
     </div>
   );
 }
