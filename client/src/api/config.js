@@ -10,10 +10,12 @@ const API_CONFIG = {
 
       },
       CUSTOMER: {
-        ACCOUNT: '/acc/customer/account'
+        ACCOUNT: '/acc/customer/account',
+        ORDERS: '/acc/customer/orders'
       },
       SHOP: {
-        FLAVORS: '/shop/all-flavors'
+        FLAVORS: '/shop/all-flavors',
+        INVENTORY_LOGS: '/shop/inventory-logs'
       }
     },
     HEADERS: {

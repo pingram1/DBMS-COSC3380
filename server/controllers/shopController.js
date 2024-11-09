@@ -73,6 +73,40 @@ class ShopController {
             }
         }
     }
+
+    static async updateQuantity(req, res) {
+        try {
+            const { id } = req.params;
+            const { quantity } = req.body;
+            
+            await ShopService.updateQuantity(id, quantity, req.user.role);
+            
+            res.json({ 
+                message: 'Quantity updated successfully',
+                quantity: quantity
+            });
+        } catch (error) {
+            console.error('Controller - updateQuantity error:', error);
+            if (error.message === SHOP_ERRORS.ITEM_NOT_FOUND) {
+                res.status(404).json({ error: error.message });
+            } else {
+                res.status(500).json({ error: error.message });
+            }
+        }
+    }
+
+    static async getInventoryLogs(req, res) {
+        try {
+            const startDate = req.query.startDate ? new Date(req.query.startDate) : new Date(0);
+            const endDate = req.query.endDate ? new Date(req.query.endDate) : new Date();
+            
+            const logs = await ShopService.getInventoryLogs(startDate, endDate);
+            res.json(logs);
+        } catch (error) {
+            console.error('Controller - getInventoryLogs error:', error);
+            res.status(500).json({ error: 'Error fetching inventory logs' });
+        }
+    }
 }
 
 module.exports = ShopController;

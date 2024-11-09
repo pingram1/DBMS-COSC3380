@@ -1,6 +1,10 @@
-module.exports = {
+const shopQueries = {
     getAllItemsQuery: `
-        SELECT i.*, f.*
+        SELECT i.*, f.*, 
+            CASE 
+                WHEN i.Quantity < 5 THEN TRUE 
+                ELSE FALSE 
+            END as LowStock
         FROM item i
         LEFT JOIN food_item f ON i.Item_ID = f.Item_ID
         ORDER BY i.Item_Name
@@ -14,8 +18,8 @@ module.exports = {
     `,
     
     insertItemQuery: `
-        INSERT INTO item (Item_Name, Unit_Price) 
-        VALUES (?, ?)
+        INSERT INTO item (Item_Name, Unit_Price, Quantity) 
+        VALUES (?, ?, ?)
     `,
     
     insertFoodItemQuery: `
@@ -25,7 +29,7 @@ module.exports = {
 
     updateItemQuery: `
         UPDATE item 
-        SET Item_name = ?, Unit_Price = ? 
+        SET Item_Name = ?, Unit_Price = ?
         WHERE Item_ID = ?
     `,
 
@@ -43,5 +47,24 @@ module.exports = {
     deleteFoodItemQuery: `
         DELETE FROM food_item
         WHERE Item_ID = ?
+    `,
+
+    getInventoryLogsQuery: `
+        SELECT 
+            l.Log_ID,
+            l.Action_Date,
+            l.Action_Type,
+            l.Quantity_Changed,
+            l.New_Quantity,
+            l.Action_By,
+            i.Item_Name
+        FROM inventory_log l
+        JOIN item i ON l.Item_ID = i.Item_ID
+        WHERE l.Action_Date BETWEEN ? AND ?
+        ORDER BY l.Action_Date DESC
     `
+};
+
+module.exports = {
+    shopQueries
 };

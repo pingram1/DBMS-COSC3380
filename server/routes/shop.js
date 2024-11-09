@@ -8,5 +8,7 @@ router.get('/all-flavors/:id', ShopController.getFlavorById);
 router.post('/all-flavors', authMiddleware, isAdmin, ShopController.createFlavor);
 router.put('/all-flavors/:id', authMiddleware, isAdmin, ShopController.updateFlavor);
 router.delete('/all-flavors/:id', authMiddleware, isAdmin, ShopController.deleteFlavor);
+router.put('/all-flavors/:id/quantity', authMiddleware, isAdmin, ShopController.updateQuantity);
+router.get('/inventory-logs', authMiddleware, isAdmin, ShopController.getInventoryLogs);
 
 module.exports = router;

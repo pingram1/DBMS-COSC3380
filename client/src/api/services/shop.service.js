@@ -45,5 +45,31 @@ export const shopService = {
     } catch (error) {
       throw error;
     }
+  },
+
+  updateQuantity: async (id, quantity, userRole) => {
+    try {
+      const response = await api.put(`${API_CONFIG.ENDPOINTS.SHOP.FLAVORS}/${id}/quantity`, {
+        quantity: parseInt(quantity),
+        userRole
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+  
+  getInventoryLogs: async (startDate, endDate) => {
+    try {
+      const response = await api.get(`${API_CONFIG.ENDPOINTS.SHOP.INVENTORY_LOGS}`, {
+        params: {
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString()
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 };
