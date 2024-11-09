@@ -25,15 +25,13 @@ app.use(cors({
 app.use(express.json());
 
 // Routers
-const employeeRouter = require('./routes/employee');
 const authRouter = require('./routes/auth');
-const itemsRouter = require('./routes/shop');
+const shopRoutes = require('./routes/shop');
 const customerRouter = require('./routes/customers');
 
 // Use Routes
-app.use('/shop', itemsRouter);
+app.use('/shop', shopRoutes);
 app.use('/auth', authRouter);
-app.use('/employee', employeeRouter);
 app.use('/acc', customerRouter);
 
 // Error handling middleware
@@ -57,7 +55,7 @@ if (process.env.NODE_ENV === 'production') {
     }
   }
   
-  // Server startup
+  // Server startup 
   const PORT = process.env.PORT || 5000;
   if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {

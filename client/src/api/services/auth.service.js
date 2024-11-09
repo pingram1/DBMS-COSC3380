@@ -17,7 +17,18 @@ export const authService = {
     try {
       return await api.post(
         API_CONFIG.ENDPOINTS.AUTH.ADMIN_LOGIN, 
-        credentials
+        credentials      // { username, password }
+      );
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  employeeLogin: async (credentials) => {
+    try {
+      return await api.post(
+        API_CONFIG.ENDPOINTS.AUTH.EMPLOYEE_LOGIN,
+        credentials      // { firstName, lastName, employeeId }
       );
     } catch (error) {
       throw error;

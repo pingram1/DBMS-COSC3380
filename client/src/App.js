@@ -12,7 +12,7 @@ const NotFound = lazy(() => import('./pages/NotFound/NotFound'));
 const About = lazy(() => import('./pages/About/About'));
 const Shop = lazy(() => import('./pages/Shop/Shop'));
 const CustomerDashboard = lazy(() => import('./pages/CustomerDashboard/CustomerDashboard'));
-const InventoryManagement = lazy(() => import('./components/InventoryManagement'));
+const InventoryManagement = lazy(() => import('./pages/EmployeeDashboard/InventoryManagement/InventoryManagement'));
 
 function App() {
   initialize();
@@ -37,6 +37,16 @@ function App() {
             element={
               <ProtectedRoute allowedRole="customer">
                 <CustomerDashboard />
+              </ProtectedRoute>
+            } 
+          />
+
+          {/* Employee Routes */}
+          <Route 
+            path="/employee/dashboard" 
+            element={
+              <ProtectedRoute allowedRole="employee">
+                <InventoryManagement />
               </ProtectedRoute>
             } 
           />
