@@ -18,9 +18,10 @@ const AUTH_ERRORS = {
 
 const CUSTOMER_ERRORS = {
     NOT_FOUND: 'Customer not found',
-    ACCESS_DENIED: 'Access denied',
-    UPDATE_ERROR: 'Error updating customer information',
-    INVALID_ROLE: 'Invalid user role'
+    INVALID_POINTS: 'Invalid points value',
+    INVALID_ROLE: 'Invalid user role',
+    UPDATE_FAILED: 'Failed to update customer data',
+    ORDERS_NOT_FOUND: 'No orders found for customer'
 };
 
 module.exports = {
