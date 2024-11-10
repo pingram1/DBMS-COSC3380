@@ -1,3 +1,4 @@
+const { transactionQueries } = require('../models/transactionQueries');
 const CustomerService = require('../services/customerService');
 const { CUSTOMER_ERRORS } = require('../utils/constants');
 
@@ -36,6 +37,138 @@ class CustomerController {
         } catch (error) {
             console.error('Controller - getOrders error:', error);
             res.status(500).json({ error: error.message });
+        }
+    }
+
+    static async register(req, res) {
+        try {
+            const { phoneNumber, address } = req.body;
+
+            if (!phoneNumber || !address) {
+                throw new Error(CUSTOMER_ERRORS.INVALID_INPUT);
+            }
+
+            const customerData = await CustomerService.registerCustomer({
+                phoneNumber,
+                address
+            });
+
+            res.status(201).json(customerData);
+        } catch (error) {
+            console.error('Controller - register error:', error);
+            
+            if (error.message === CUSTOMER_ERRORS.ALREADY_EXISTS) {
+                res.status(409);
+            } else if (error.message === CUSTOMER_ERRORS.INVALID_INPUT) {
+                res.status(400);
+            } else {
+                res.status(500);
+            }
+            
+            res.json({ error: error.message });
+        }
+    }
+
+    static async placeOrder(req, res) {
+        try {
+            if (req.user.role !== 'customer') {
+                throw new Error(CUSTOMER_ERRORS.INVALID_ROLE);
+            }
+
+            const { items, total } = req.body;
+            if (!items?.length || !total) {
+                throw new Error(CUSTOMER_ERRORS.INVALID_ORDER);
+            }
+
+            const orderResult = await CustomerService.placeOrder(req.user.id, {
+                items,
+                total
+            });
+
+            res.status(201).json({
+                message: 'Order placed successfully',
+                ...orderResult
+            });
+        } catch (error) {
+            console.error('Controller - placeOrder error:', error);
+
+            if (error.message === CUSTOMER_ERRORS.INVALID_ROLE) {
+                res.status(403);
+            } else if (error.message === CUSTOMER_ERRORS.INVALID_ORDER) {
+                res.status(400);
+            } else {
+                res.status(500);
+            }
+
+            res.json({ error: error.message });
+        }
+    }
+
+    static async placeGuestOrder(req, res) {
+        try {
+            const { items, total, customerInfo } = req.body;
+
+            if (!items?.length || !total || !customerInfo) {
+                throw new Error(CUSTOMER_ERRORS.INVALID_ORDER);
+            }
+
+            if (!customerInfo.name || !customerInfo.phoneNumber || !customerInfo.address) {
+                throw new Error(CUSTOMER_ERRORS.INVALID_GUEST_INFO);
+            }
+
+            const orderResult = await CustomerService.placeGuestOrder({
+                items,
+                total,
+                customerInfo
+            });
+
+            res.status(201).json({
+                message: 'Guest order placed successfully',
+                ...orderResult
+            });
+        } catch (error) {
+            console.error('Controller - placeGuestOrder error:', error);
+
+            if (error.message === CUSTOMER_ERRORS.INVALID_ORDER) {
+                res.status(400);
+            } else if (error.message === CUSTOMER_ERRORS.INVALID_GUEST_INFO) {
+                res.status(400);
+            } else {
+                res.status(500);
+            }
+
+            res.json({ error: error.message });
+        }
+    }
+
+    static async updateAccount(req, res) {
+        try {
+            if (req.user.role !== 'customer') {
+                throw new Error(CUSTOMER_ERRORS.INVALID_ROLE);
+            }
+
+            const { address } = req.body;
+            if (!address) {
+                throw new Error(CUSTOMER_ERRORS.INVALID_INPUT);
+            }
+
+            const customerData = await CustomerService.updateAccount(req.user.id, {
+                address
+            });
+
+            res.json(customerData);
+        } catch (error) {
+            console.error('Controller - updateAccount error:', error);
+            
+            if (error.message === CUSTOMER_ERRORS.INVALID_ROLE) {
+                res.status(403);
+            } else if (error.message === CUSTOMER_ERRORS.INVALID_INPUT) {
+                res.status(400);
+            } else {
+                res.status(500);
+            }
+            
+            res.json({ error: error.message });
         }
     }
 }

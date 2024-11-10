@@ -21,11 +21,20 @@ const CUSTOMER_ERRORS = {
     INVALID_POINTS: 'Invalid points value',
     INVALID_ROLE: 'Invalid user role',
     UPDATE_FAILED: 'Failed to update customer data',
-    ORDERS_NOT_FOUND: 'No orders found for customer'
+    ORDERS_NOT_FOUND: 'No orders found for customer',
+    ALREADY_EXISTS: 'Customer with this phone number already exists',
+    INVALID_ORDER: 'Invalid order data',
+    INVALID_GUEST_INFO: 'Missing required guest information',
 };
+
+const TRANSACTION_ERRORS = {
+    INSUFFICIENT_STOCK: 'One or more items are out of stock',
+    PAYMENT_FAILED: 'Payment processing failed',
+}
 
 module.exports = {
     SHOP_ERRORS,
     AUTH_ERRORS,
-    CUSTOMER_ERRORS
+    CUSTOMER_ERRORS,
+    TRANSACTION_ERRORS
 };
