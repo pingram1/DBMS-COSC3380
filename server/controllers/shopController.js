@@ -108,19 +108,6 @@ class ShopController {
         }
     }
 
-    static async getSalesReport(req, res) {
-        try {
-            const startDate = new Date(req.query.startDate);
-            const endDate = new Date(req.query.endDate);
-            
-            const reportData = await ShopService.getSalesReport(startDate, endDate);
-            res.json(reportData);
-
-        } catch (error) {
-            console.error('Controller - getSalesReport error:', error);
-            res.status(500).json({ error: error.message });
-        }
-    }
 }
 
 module.exports = ShopController;

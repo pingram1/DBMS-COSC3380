@@ -71,23 +71,5 @@ export const shopService = {
     } catch (error) {
       throw error;
     }
-  },
-
-  getSalesReport: async (startDate, endDate) => {
-    try {
-      const response = await api.get(
-        `${API_CONFIG.ENDPOINTS.SHOP.SALES_REPORT}`,
-        {
-          params: {
-            startDate: startDate.toISOString(),
-            endDate: endDate.toISOString()
-          }
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching sales report:', error);
-      throw error;
-    }
   }
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Line, BarChart, Bar } from 'recharts';
-import { shopService } from '../../../api';
+import { LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Line } from 'recharts';
+import { reportService } from '../../../api';
 
 const SalesReport = () => {
   const [salesData, setSalesData] = useState([]);
@@ -16,17 +16,12 @@ const SalesReport = () => {
     topSellingItems: []
   });
 
-  useEffect(() => {
-    fetchSalesData();
-  }, [dateRange]);
-
-  const fetchSalesData = async () => {
+  const fetchSalesData = React.useCallback(async () => {
     try {
       setLoading(true);
       let startDate = new Date();
       let endDate = new Date();
 
-      // Set date range based on selection
       switch (dateRange) {
         case 'week':
           startDate.setDate(startDate.getDate() - 7);
@@ -41,7 +36,7 @@ const SalesReport = () => {
           startDate.setMonth(startDate.getMonth() - 1);
       }
 
-      const data = await shopService.getSalesReport(startDate, endDate);
+      const data = await reportService.getSalesReport(startDate, endDate);
       setSalesData(data.salesData);
       setSummaryStats(data.summary);
       setError(null);
@@ -51,7 +46,11 @@ const SalesReport = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [dateRange]);
+
+  useEffect(() => {
+    fetchSalesData();
+  }, [fetchSalesData]);
 
   if (loading) return <div className="p-4">Loading sales data...</div>;
   if (error) return <div className="p-4 text-red-500">{error}</div>;

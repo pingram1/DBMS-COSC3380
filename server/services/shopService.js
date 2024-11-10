@@ -195,46 +195,6 @@ class ShopService {
         }
     }
 
-    static async getSalesReport(startDate, endDate) {
-        const connection = await pool.getConnection();
-        try {
-            await connection.beginTransaction();
-
-            // Get sales data
-            const [salesData] = await connection.query(
-                salesReportQueries.getSalesData,
-                [startDate, endDate]
-            );
-
-            // Get top selling items
-            const [topSellingItems] = await connection.query(
-                salesReportQueries.getTopSellingItems,
-                [startDate, endDate]
-            );
-
-            // Calculate summary statistics
-            const summary = {
-                totalRevenue: salesData.reduce((sum, day) => sum + Number(day.revenue), 0),
-                totalProfit: salesData.reduce((sum, day) => sum + Number(day.profit), 0),
-                totalOrders: salesData.reduce((sum, day) => sum + Number(day.orders), 0),
-                averageOrderValue: salesData.length > 0 
-                    ? salesData.reduce((sum, day) => sum + Number(day.revenue), 0) / 
-                      salesData.reduce((sum, day) => sum + Number(day.orders), 0)
-                    : 0,
-                topSellingItems
-            };
-
-            await connection.commit();
-            return { salesData, summary };
-
-        } catch (error) {
-            await connection.rollback();
-            console.error('Error in getSalesReport:', error);
-            throw new Error(SHOP_ERRORS.DB_ERROR);
-        } finally {
-            connection.release();
-        }
-    }
 }
 
 module.exports = ShopService;

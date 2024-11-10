@@ -56,7 +56,13 @@ const Navbar = () => {
           <div className="nav-items">
             <Link to="/">Home</Link>
             <Link to="/admin/dashboard">Inventory</Link>
-            <Link to="/admin/reports/">Reports</Link>
+            <div className="dropdown">
+              <span className="nav-link">Reports</span>
+              <div className="dropdown-content">
+                <Link to="/admin/reports/sales">Sales Report</Link>
+                <Link to="/admin/reports/inventory">Inventory Report</Link>
+              </div>
+            </div>
             <button onClick={handleLogout} className="logout-btn">Logout</button>
           </div>
         </nav>

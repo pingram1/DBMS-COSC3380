@@ -11,7 +11,4 @@ router.delete('/all-flavors/:id', authMiddleware, isAdmin, ShopController.delete
 router.put('/all-flavors/:id/quantity', authMiddleware, isAdmin, ShopController.updateQuantity);
 router.get('/inventory-logs', authMiddleware, isAdmin, ShopController.getInventoryLogs);
 
-// Sale reports
-router.get('/shop/sales-report', authMiddleware, isStrictAdmin, ShopController.getSalesReport);
-
 module.exports = router;

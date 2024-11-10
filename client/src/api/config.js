@@ -18,7 +18,10 @@ const API_CONFIG = {
       SHOP: {
         FLAVORS: '/shop/all-flavors',
         INVENTORY_LOGS: '/shop/inventory-logs',
-        SALE_REPORTS: '/shop/sales-report'
+      },
+      REPORTS: {
+        SALES: '/reports/sales',
+        INVENTORY: '/reports/inventory'
       }
     },
     HEADERS: {
