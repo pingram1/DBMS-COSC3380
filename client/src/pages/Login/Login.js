@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { authService } from '../../api';
 import './Login.css';
 
 const Login = () => {
+  const location = useLocation();
   const [loginType, setLoginType] = useState('customer');
   const [formData, setFormData] = useState({
     username: '',
@@ -59,21 +60,23 @@ const Login = () => {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('userRole', response.data.user.role);
         
-        switch(response.data.user.role) {
-          case 'admin':
-            navigate('/admin/dashboard');
-            break;
-          case 'employee':
-            navigate('/employee/dashboard');
-            break;
-          case 'customer':
-            navigate('/customer/dashboard');
-            break;
-          default:
-            setError('Invalid user role');
+        if (location.state?.returnTo === '/checkout-flow') {
+          navigate('/checkout', { state: { fromLogin: true } });
+        } else {
+          switch(response.data.user.role) {
+            case 'admin':
+              navigate('/admin/dashboard');
+              break;
+            case 'employee':
+              navigate('/employee/dashboard');
+              break;
+            case 'customer':
+              navigate('/customer/dashboard');
+              break;
+            default:
+              setError('Invalid user role');
+          }
         }
-      } else {
-        setError('Invalid response from server');
       }
     } catch (err) {
       console.error('Login error:', err);
@@ -208,6 +211,12 @@ const Login = () => {
         <div>
           <button type="submit">
             Sign in
+          </button>
+        </div>
+        <div>
+          <p>Don't have an account?</p>
+          <button type="button" onClick={() => navigate('/register')}>
+            Register Now
           </button>
         </div>
       </form>

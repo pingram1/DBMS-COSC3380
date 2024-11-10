@@ -190,17 +190,10 @@
     vertical-align: top;
   }
 
-  .noLogs {
-    text-align: center;
-    padding: 2rem;
+  .currentStock {
+    font-size: 0.8em;
     color: #666;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-  
-  .quantityCell {
-    min-width: 200px;
+    margin-top: 4px;
   }
   
   .quantityControl {
@@ -211,33 +204,6 @@
   
   .quantityInput {
     width: 80px;
-    padding: 4px 8px;
-    border: 1px solid #d9d9d9;
-    border-radius: 4px;
-    text-align: center;
   }
+
   
-  .quantityInput::-webkit-inner-spin-button,
-  .quantityInput::-webkit-outer-spin-button {
-    opacity: 1;
-  }
-  
-  .applyButton {
-    padding: 4px 12px;
-    background-color: #1890ff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .applyButton:hover {
-    background-color: #40a9ff;
-  }
-  
-  .lowStockWarning {
-    display: block;
-    color: #ff4d4f;
-    font-size: 0.8rem;
-    margin-top: 4px;
-  }

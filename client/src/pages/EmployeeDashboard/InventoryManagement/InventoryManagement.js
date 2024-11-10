@@ -23,7 +23,12 @@ function InventoryManagement() {
   const fetchItems = async () => {
     try {
       const data = await shopService.getAllFlavors();
-      setItems(data);
+      // Initialize items with temporary quantity field
+      const itemsWithTemp = data.map(item => ({
+        ...item,
+        tempQuantity: item.Quantity
+      }));
+      setItems(itemsWithTemp);
       setError(null);
     } catch (err) {
       setError(err.message || 'Error loading items');
@@ -86,6 +91,7 @@ function InventoryManagement() {
       try {
         await shopService.deleteFlavor(itemId);
         await fetchItems();
+        await fetchInventoryLogs();
         setError(null);
       } catch (err) {
         if (err.status === 404) {
@@ -100,19 +106,35 @@ function InventoryManagement() {
 
   const handleQuantityChange = async (itemId, newQuantity) => {
     try {
-      // Get user role from localStorage
       const userRole = localStorage.getItem('userRole');
       await shopService.updateQuantity(itemId, parseInt(newQuantity), userRole);
-      await fetchItems();
+      
+      // Update local state immediately
+      setItems(prevItems => prevItems.map(item => 
+        item.Item_ID === itemId 
+          ? { ...item, Quantity: newQuantity, tempQuantity: newQuantity }
+          : item
+      ));
+      
+      // Refresh inventory logs
       await fetchInventoryLogs();
       setError(null);
     } catch (err) {
       setError(err.message || 'Error updating quantity');
+      // Revert changes on error
+      await fetchItems();
     }
   };
 
+  const handleQuantityInputChange = (itemId, newValue) => {
+    setItems(prevItems => prevItems.map(item => 
+      item.Item_ID === itemId 
+        ? { ...item, tempQuantity: newValue }
+        : item
+    ));
+  };
+
   const handleApplyQuantity = (itemId, newQuantity, currentQuantity) => {
-    // Convert to numbers and handle NaN
     const newQty = parseInt(newQuantity) || 0;
     const currentQty = parseInt(currentQuantity) || 0;
     const quantityDiff = Math.abs(newQty - currentQty);
@@ -158,6 +180,38 @@ function InventoryManagement() {
       </div>
     );
   };
+
+  const renderQuantityCell = (item) => (
+    <td className={styles.quantityCell}>
+      <div className={styles.quantityControl}>
+        <input
+          type="number"
+          min="0"
+          value={item.tempQuantity}
+          onChange={(e) => handleQuantityInputChange(item.Item_ID, e.target.value)}
+          className={`${styles.quantityInput} ${item.LowStock ? styles.lowStock : ''}`}
+        />
+        <button 
+          onClick={() => handleApplyQuantity(
+            item.Item_ID, 
+            item.tempQuantity,
+            item.Quantity
+          )}
+          className={styles.applyButton}
+        >
+          Apply
+        </button>
+      </div>
+      <div className={styles.currentStock}>
+        Current Stock: {item.Quantity}
+      </div>
+      {item.LowStock && (
+        <span className={styles.lowStockWarning}>
+          Low Stock!
+        </span>
+      )}
+    </td>
+  );
 
   if (loading) return <div>Loading...</div>;
 
@@ -271,40 +325,7 @@ function InventoryManagement() {
                         className={styles.input}
                       />
                     </td>
-                    <td className={styles.quantityCell}>
-                      <div className={styles.quantityControl}>
-                        <input
-                          type="number"
-                          min="0"
-                          value={item.Quantity || 0}  // Add default value of 0
-                          onChange={(e) => {
-                            const newValue = parseInt(e.target.value) || 0;  // Parse as integer
-                            const newItems = items.map(i => 
-                              i.Item_ID === item.Item_ID 
-                                ? { ...i, Quantity: newValue }
-                                : i
-                            );
-                            setItems(newItems);
-                          }}
-                          className={`${styles.quantityInput} ${item.LowStock ? styles.lowStock : ''}`}
-                        />
-                        <button 
-                          onClick={() => handleApplyQuantity(
-                            item.Item_ID, 
-                            parseInt(items.find(i => i.Item_ID === item.Item_ID).Quantity) || 0,
-                            parseInt(item.Quantity) || 0
-                          )}
-                          className={styles.applyButton}
-                        >
-                          Apply
-                        </button>
-                      </div>
-                      {item.LowStock && (
-                        <span className={styles.lowStockWarning}>
-                          Low Stock!
-                        </span>
-                      )}
-                    </td>
+                    {renderQuantityCell(item)}
                     <td>
                       <input
                         type="number"
@@ -354,39 +375,7 @@ function InventoryManagement() {
                   <>
                     <td>{item.Item_Name}</td>
                     <td>${item.Unit_Price}</td>
-                    <td className={styles.quantityCell}>
-                      <div className={styles.quantityControl}>
-                        <input
-                          type="number"
-                          min="0"
-                          value={item.Quantity}
-                          onChange={(e) => {
-                            const newItems = items.map(i => 
-                              i.Item_ID === item.Item_ID 
-                                ? { ...i, Quantity: e.target.value }
-                                : i
-                            );
-                            setItems(newItems);
-                          }}
-                          className={`${styles.quantityInput} ${item.LowStock ? styles.lowStock : ''}`}
-                        />
-                        <button 
-                          onClick={() => handleApplyQuantity(
-                            item.Item_ID, 
-                            items.find(i => i.Item_ID === item.Item_ID).Quantity,
-                            item.Quantity
-                          )}
-                          className={styles.applyButton}
-                        >
-                          Apply
-                        </button>
-                      </div>
-                      {item.LowStock && (
-                        <span className={styles.lowStockWarning}>
-                          Low Stock!
-                        </span>
-                      )}
-                    </td>
+                    {renderQuantityCell(item)}
                     <td>{item.Calories}</td>
                     <td>{item.Protein}g</td>
                     <td>{item.Sugar}g</td>
