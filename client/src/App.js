@@ -15,6 +15,7 @@ const CustomerDashboard = lazy(() => import('./pages/CustomerDashboard/CustomerD
 const InventoryManagement = lazy(() => import('./pages/EmployeeDashboard/InventoryManagement/InventoryManagement'));
 const Checkout = lazy(() => import('./components/Checkout/Checkout'));
 const OrderConfirmation = lazy(() => import('./components/Checkout/OrderConfirmation'));
+const SaleReports = lazy(() => import('./pages/AdminDashboard/SaleReports/SaleReports'))
 
 function App() {
   initialize();
@@ -119,6 +120,7 @@ function App() {
               element={
                 <ProtectedRoute allowedRole="admin">
                   <InventoryManagement />
+                  <SaleReports />
                 </ProtectedRoute>
               }
             />

@@ -4,7 +4,8 @@ const SHOP_ERRORS = {
     DB_ERROR: 'Database error occurred',
     CREATE_ERROR: 'Error creating item',
     UPDATE_ERROR: 'Error updating item',
-    DELETE_ERROR: 'Error deleting item'
+    DELETE_ERROR: 'Error deleting item',
+    SALES_REPORT_ERROR: 'Error generating sales report'
 };
 
 const AUTH_ERRORS = {

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const ShopController = require('../controllers/shopController');
-const { authMiddleware, isAdmin } = require('../middlewares/auth');
+const { authMiddleware, isAdmin, isStrictAdmin } = require('../middlewares/auth');
 
 router.get('/all-flavors', ShopController.getAllFlavors);
 router.get('/all-flavors/:id', ShopController.getFlavorById);
@@ -10,5 +10,8 @@ router.put('/all-flavors/:id', authMiddleware, isAdmin, ShopController.updateFla
 router.delete('/all-flavors/:id', authMiddleware, isAdmin, ShopController.deleteFlavor);
 router.put('/all-flavors/:id/quantity', authMiddleware, isAdmin, ShopController.updateQuantity);
 router.get('/inventory-logs', authMiddleware, isAdmin, ShopController.getInventoryLogs);
+
+// Sale reports
+router.get('/shop/sales-report', authMiddleware, isStrictAdmin, ShopController.getSalesReport);
 
 module.exports = router;
