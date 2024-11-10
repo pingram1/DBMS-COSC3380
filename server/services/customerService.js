@@ -60,12 +60,18 @@ class CustomerService {
             // Insert new customer
             const [result] = await connection.query(
                 customerQueries.createCustomer,
-                [customerData.phoneNumber, customerData.address]
+                [
+                    customerData.phoneNumber,
+                    customerData.address,
+                    customerData.firstName,
+                    customerData.lastName,
+                    customerData.dateOfBirth
+                ]
             );
 
             const customerId = result.insertId;
 
-            // Get full customer data
+            // Get the newly created customer data
             const [newCustomer] = await connection.query(
                 customerQueries.getCustomerById,
                 [customerId]
@@ -73,8 +79,10 @@ class CustomerService {
 
             await connection.commit();
             return newCustomer[0];
+
         } catch (error) {
             await connection.rollback();
+            console.error('Service - registerCustomer error:', error);
             throw error;
         } finally {
             connection.release();

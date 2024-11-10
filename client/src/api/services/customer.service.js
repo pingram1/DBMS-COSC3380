@@ -23,10 +23,16 @@ export const customerService = {
 
   register: async (customerData) => {
     try {
-      const response = await api.post(API_CONFIG.ENDPOINTS.CUSTOMER.REGISTER, {
-        phoneNumber: customerData.phoneNumber,
-        address: customerData.address
-      });
+      const response = await api.post(
+        API_CONFIG.ENDPOINTS.CUSTOMER.REGISTER, 
+        {
+          firstName: customerData.firstName,
+          lastName: customerData.lastName,
+          phoneNumber: customerData.phoneNumber,
+          dateOfBirth: customerData.dateOfBirth,
+          address: customerData.address
+        }
+      );
       return response.data;
     } catch (error) {
       console.error('Registration error:', error);

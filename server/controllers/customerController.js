@@ -42,33 +42,52 @@ class CustomerController {
 
     static async register(req, res) {
         try {
-            const { phoneNumber, address } = req.body;
+            const { 
+                firstName, 
+                lastName, 
+                phoneNumber, 
+                dateOfBirth, 
+                address 
+            } = req.body;
 
-            if (!phoneNumber || !address) {
-                throw new Error(CUSTOMER_ERRORS.INVALID_INPUT);
+            // Validate required fields
+            if (!firstName || !lastName || !phoneNumber || !dateOfBirth || !address) {
+                return res.status(400).json({ 
+                    error: CUSTOMER_ERRORS.INVALID_INPUT 
+                });
             }
 
             const customerData = await CustomerService.registerCustomer({
+                firstName,
+                lastName,
                 phoneNumber,
+                dateOfBirth,
                 address
             });
 
-            res.status(201).json(customerData);
+            res.status(201).json({
+                message: 'Registration successful',
+                customer: customerData
+            });
+
         } catch (error) {
             console.error('Controller - register error:', error);
             
+            let statusCode = 500;
+            let errorMessage = 'Internal server error';
+
             if (error.message === CUSTOMER_ERRORS.ALREADY_EXISTS) {
-                res.status(409);
+                statusCode = 409;
+                errorMessage = 'Phone number already registered';
             } else if (error.message === CUSTOMER_ERRORS.INVALID_INPUT) {
-                res.status(400);
-            } else {
-                res.status(500);
+                statusCode = 400;
+                errorMessage = 'Missing required fields';
             }
-            
-            res.json({ error: error.message });
+
+            res.status(statusCode).json({ error: errorMessage });
         }
     }
-
+    
     static async placeOrder(req, res) {
         try {
             if (req.user.role !== 'customer') {

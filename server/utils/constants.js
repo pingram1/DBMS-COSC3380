@@ -23,8 +23,8 @@ const CUSTOMER_ERRORS = {
     UPDATE_FAILED: 'Failed to update customer data',
     ORDERS_NOT_FOUND: 'No orders found for customer',
     ALREADY_EXISTS: 'Customer with this phone number already exists',
-    INVALID_ORDER: 'Invalid order data',
-    INVALID_GUEST_INFO: 'Missing required guest information',
+    INVALID_INPUT: 'Missing required customer information',
+    INSUFFICIENT_STOCK: 'Insufficient stock for one or more items',
 };
 
 const TRANSACTION_ERRORS = {

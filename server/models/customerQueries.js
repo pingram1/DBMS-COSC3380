@@ -1,30 +1,30 @@
 const customerQueries = {
     getCustomerById: `
       SELECT 
-        c.Customer_ID, 
-        c.Membership_Level, 
-        c.Phone_Number, 
-        c.First_Name, 
-        c.Last_Name,
-        c.Address, 
-        c.Birth_Date,
-        c.Account_Creation_Date, 
-        c.Total_Accrued_Discount_Points, 
-        c.Discount_Points_Used,
-        (c.Total_Accrued_Discount_Points - c.Discount_Points_Used) as Available_Points,
-        CASE
-          WHEN c.Membership_Level = 'Bronze' THEN 50 - (c.Total_Accrued_Discount_Points - c.Discount_Points_Used)
-          WHEN c.Membership_Level = 'Silver' THEN 100 - (c.Total_Accrued_Discount_Points - c.Discount_Points_Used)
-          WHEN c.Membership_Level = 'Gold' THEN 200 - (c.Total_Accrued_Discount_Points - c.Discount_Points_Used)
-          ELSE 0
-        END as Points_To_Next_Level,
-        MONTH(c.Birth_Date) as Birth_Month
+          c.Customer_ID, 
+          c.Membership_Level, 
+          c.Phone_Number, 
+          c.Account_Creation_Date, 
+          c.Total_Accrued_Discount_Points, 
+          c.Discount_Points_Used,
+          c.First_Name,
+          c.Last_Name,
+          c.Address,
+          c.Birth_Date,
+          (c.Total_Accrued_Discount_Points - c.Discount_Points_Used) as Available_Points,
+          CASE
+              WHEN c.Membership_Level = 'Bronze' THEN 50 - (c.Total_Accrued_Discount_Points - c.Discount_Points_Used)
+              WHEN c.Membership_Level = 'Silver' THEN 100 - (c.Total_Accrued_Discount_Points - c.Discount_Points_Used)
+              WHEN c.Membership_Level = 'Gold' THEN 200 - (c.Total_Accrued_Discount_Points - c.Discount_Points_Used)
+              ELSE 0
+          END as Points_To_Next_Level
       FROM customer c
       WHERE c.Customer_ID = ?
     `,
-  
+    
     getCustomerByPhone: `
-      SELECT * FROM customer WHERE Phone_Number = ?
+        SELECT * FROM customer 
+        WHERE Phone_Number = ?
     `,
   
     getCustomerOrders: `
@@ -60,17 +60,18 @@ const customerQueries = {
   
     createCustomer: `
       INSERT INTO customer (
-        Phone_Number, 
-        Address,
-        First_Name,
-        Last_Name,
-        Birth_Date,
-        Membership_Level,
-        Account_Creation_Date,
-        Current_Discount_Points,
-        Discount_Points_Used,
-        Total_Accrued_Discount_Points
-      ) VALUES (?, ?, ?, ?, ?, 'Bronze', CURDATE(), 0, 0, 0)
+          Phone_Number,
+          Address,
+          First_Name,
+          Last_Name,
+          Birth_Date,
+          Membership_Level,
+          Account_Creation_Date,
+          Total_Accrued_Discount_Points,
+          Discount_Points_Used,
+          Current_Discount_Points,
+          Member_Length
+      ) VALUES (?, ?, ?, ?, ?, 'Bronze', CURDATE(), 0, 0, 0, 0)
     `,
   
     updateCustomerAddress: `

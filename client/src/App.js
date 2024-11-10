@@ -7,6 +7,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 const NavBar = lazy(() => import('./components/Navbar/Navbar'));
 const Home = lazy(() => import('./pages/Home/Home'));
 const Login = lazy(() => import('./pages/Login/Login'));
+const Register = lazy(() => import('./pages/Register/Register'));
 const NotFound = lazy(() => import('./pages/NotFound/NotFound'));
 const About = lazy(() => import('./pages/About/About'));
 const Shop = lazy(() => import('./pages/Shop/Shop'));
@@ -71,6 +72,7 @@ function App() {
             />
             <Route path="/about" element={<About />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
              {/* Checkout Routes */}
              <Route

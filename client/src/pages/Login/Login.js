@@ -213,6 +213,12 @@ const Login = () => {
             Sign in
           </button>
         </div>
+        <div>
+          <p>Don't have an account?</p>
+          <button type="button" onClick={() => navigate('/register')}>
+            Register Now
+          </button>
+        </div>
       </form>
     </div>
   );
