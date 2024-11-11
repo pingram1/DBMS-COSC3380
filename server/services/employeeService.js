@@ -47,7 +47,7 @@ class EmployeeService {
 
             // Check for existing employee
             const [existing] = await connection.query(
-                employeeQueries.getEmployeeByPhone,
+                employeeQueries.getEmployeeByID,
                 [employeeData.phoneNumber]
             );
 
