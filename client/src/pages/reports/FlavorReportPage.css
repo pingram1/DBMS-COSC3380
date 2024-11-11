@@ -1,0 +1,27 @@
+/* FlavorReportPage.css */
+
+.flavor-charts-container {
+    display: flex;
+    flex-wrap: wrap;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Adjust min-width as needed */
+    gap: 100px; /* Increase the space between charts */
+    padding: 20px;
+  }
+
+.chart-container {
+    width: 600px; /* Control individual chart width */
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+  
+  .flavor-chart {
+    border: 1px solid #ddd;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Adds a shadow effect */
+    width: 100%;
+  }
+  
