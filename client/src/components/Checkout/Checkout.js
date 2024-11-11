@@ -1,176 +1,146 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { customerService, authService } from '../../api';
-import styles from './Checkout.css';
+import { customerService } from '../../api';
 
-const Checkout = ({ basketItems, total }) => {
+const Checkout = ({ basketItems, clearBasket, updateBasketQuantity, removeFromBasket }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [showRegistration, setShowRegistration] = useState(false);
-  const [formData, setFormData] = useState({
+  const [customerData, setCustomerData] = useState({
+    name: '',
     phoneNumber: '',
     address: ''
   });
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    setIsLoggedIn(!!token);
+    if (token) {
+      setIsLoggedIn(true);
+      fetchCustomerData();
+    }
   }, []);
 
-  const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleGuestCheckout = () => {
-    setShowRegistration(true);
-  };
-
-  const handleRegistration = async (e) => {
-    e.preventDefault();
+  const fetchCustomerData = async () => {
     try {
-      // Register customer and create account
-      await customerService.register(formData);
-      // Log them in automatically
-      const response = await authService.customerLogin(formData.phoneNumber);
-      
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('userRole', 'customer');
-      
-      // Proceed with order
-      handlePlaceOrder();
-    } catch (error) {
-      console.error('Registration error:', error);
+      const data = await customerService.getAccount();
+      setCustomerData({
+        name: `${data.First_Name} ${data.Last_Name}`,
+        phoneNumber: data.Phone_Number || '',
+        address: data.Address || ''
+      });
+    } catch (err) {
+      console.error('Error fetching customer data:', err);
     }
   };
 
-  const handlePlaceOrder = async () => {
-    try {
-      // Add order processing logic here
-      const orderData = {
-        items: basketItems,
-        total,
-        ...formData
-      };
-      
-      await customerService.placeOrder(orderData);
-      navigate('/order-confirmation');
-    } catch (error) {
-      console.error('Order error:', error);
-    }
-  };
-
-  if (!isLoggedIn && !showRegistration) {
-    return (
-      <div className={styles.checkoutContainer}>
-        <h2 className={styles.title}>Checkout</h2>
-        
-        <div className={styles.loginOptions}>
-          <div className={styles.option}>
-            <h3>Already a customer?</h3>
-            <button 
-              onClick={() => navigate('/login')}
-              className={styles.loginBtn}
-            >
-              Login
-            </button>
-          </div>
-
-          <div className={styles.divider}>or</div>
-
-          <div className={styles.option}>
-            <h3>New customer?</h3>
-            <p>Register now to earn points and get exclusive benefits!</p>
-            <button 
-              onClick={handleGuestCheckout}
-              className={styles.registerBtn}
-            >
-              Register & Checkout
-            </button>
-          </div>
-        </div>
-      </div>
+  const calculateTotal = () => {
+    return basketItems.reduce((sum, item) => 
+      sum + (item.Unit_Price * item.quantity), 0
     );
-  }
+  };
 
-  if (showRegistration) {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+
+    try {
+      if (isLoggedIn) {
+        // Place order for logged-in customer
+        const orderData = {
+          items: basketItems.map(item => ({
+            Item_ID: item.Item_ID,
+            quantity: item.quantity,
+            Unit_Price: item.Unit_Price
+          })),
+          total: calculateTotal()
+        };
+
+        await customerService.placeOrder(orderData);
+      } else {
+        // Place order for guest
+        const orderData = {
+          items: basketItems.map(item => ({
+            Item_ID: item.Item_ID,
+            quantity: item.quantity,
+            Unit_Price: item.Unit_Price
+          })),
+          total: calculateTotal(),
+          customerInfo: {
+            name: customerData.name,
+            phoneNumber: customerData.phoneNumber,
+            address: customerData.address,
+            isGuest: false
+          }
+        };
+
+        await customerService.placeGuestOrder(orderData);
+      }
+
+      clearBasket();
+      navigate('/order-confirmation');
+    } catch (err) {
+      setError(err.message || 'Error placing order');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!basketItems?.length) {
     return (
-      <div className={styles.checkoutContainer}>
-        <h2 className={styles.title}>Quick Registration</h2>
-        
-        <form onSubmit={handleRegistration} className={styles.registrationForm}>
-          <div className={styles.formGroup}>
-            <label>Phone Number</label>
-            <input
-              type="tel"
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              onChange={handleInputChange}
-              required
-              placeholder="(123) 456-7890"
-              pattern="[0-9]{10}"
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label>Delivery Address</label>
-            <textarea
-              name="address"
-              value={formData.address}
-              onChange={handleInputChange}
-              required
-              placeholder="Enter your delivery address"
-            />
-          </div>
-
-          <div className={styles.orderSummary}>
-            <h3>Order Summary</h3>
-            {basketItems.map(item => (
-              <div key={item.Item_ID} className={styles.summaryItem}>
-                <span>{item.quantity}x {item.Item_Name}</span>
-                <span>${(item.Unit_Price * item.quantity).toFixed(2)}</span>
-              </div>
-            ))}
-            <div className={styles.total}>
-              <span>Total:</span>
-              <span>${total.toFixed(2)}</span>
-            </div>
-          </div>
-
-          <button type="submit" className={styles.submitBtn}>
-            Complete Registration & Place Order
-          </button>
-        </form>
+      <div className="p-4 text-center">
+        <h2 className="text-xl font-bold mb-4">Your basket is empty</h2>
+        <button
+          onClick={() => navigate('/shop')}
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          Return to Shop
+        </button>
       </div>
     );
   }
 
   return (
-    <div className={styles.checkoutContainer}>
-      <h2 className={styles.title}>Checkout</h2>
-      
-      <div className={styles.orderSummary}>
-        <h3>Order Summary</h3>
-        {basketItems.map(item => (
-          <div key={item.Item_ID} className={styles.summaryItem}>
-            <span>{item.quantity}x {item.Item_Name}</span>
-            <span>${(item.Unit_Price * item.quantity).toFixed(2)}</span>
-          </div>
-        ))}
-        <div className={styles.total}>
-          <span>Total:</span>
-          <span>${total.toFixed(2)}</span>
+    <div className="max-w-2xl mx-auto p-4">
+      <h2 className="text-2xl font-bold mb-6">Checkout</h2>
+
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
         </div>
+      )}
+
+      <div className="border rounded p-4 mb-4">
+        <h3 className="font-bold mb-2">Delivery Information</h3>
+        <p>Name: {customerData.name}</p>
+        <p>Phone: {customerData.phoneNumber}</p>
+        <p>Address: {customerData.address}</p>
       </div>
 
-      <button 
-        onClick={handlePlaceOrder}
-        className={styles.placeOrderBtn}
-      >
-        Place Order
-      </button>
+      <form onSubmit={handleSubmit}>
+        <div className="border rounded p-4 mt-4">
+          <h3 className="font-bold mb-2">Order Summary</h3>
+          {basketItems.map(item => (
+            <div key={item.Item_ID} className="flex justify-between py-2">
+              <span>{item.quantity}x {item.Item_Name}</span>
+              <span>${(item.Unit_Price * item.quantity).toFixed(2)}</span>
+            </div>
+          ))}
+          <div className="border-t mt-2 pt-2 font-bold">
+            Total: ${calculateTotal().toFixed(2)}
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full bg-green-500 text-white p-2 rounded"
+        >
+          {isLoading ? 'Processing...' : 'Place Order'}
+        </button>
+      </form>
     </div>
   );
 };

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { shopService } from '../../api';
+import Basket from '../../components/Basket/Basket';
 
-const Shop = () => {
+const Shop = ({ basketItems, addToBasket, updateBasketQuantity, removeFromBasket }) => {
   const [items, setItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [itemDetails, setItemDetails] = useState(null);
@@ -13,7 +14,7 @@ const Shop = () => {
     const fetchItems = async () => {
       try {
         const items = await shopService.getAllFlavors(); 
-        setItems(items || []); // Make sure data is an array
+        setItems(items || []);
         setLoading(false);
       } catch (err) {
         console.error('Error fetching items:', err);
@@ -42,10 +43,21 @@ const Shop = () => {
     }
   };
 
+  const handleAddToBasket = (item) => {
+    addToBasket(item);
+  };
+
+  const handleUpdateQuantity = (itemId, quantity) => {
+    updateBasketQuantity(itemId, quantity);
+  };
+
+  const handleRemoveFromBasket = (itemId) => {
+    removeFromBasket(itemId);
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
 
-  // Ensure items is an array before rendering
   if (!Array.isArray(items)) {
     console.error('Items is not an array:', items);
     return (
@@ -56,64 +68,65 @@ const Shop = () => {
   }
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h1 style={{ textAlign: 'center', marginBottom: '20px', fontSize: '24px' }}>Our Menu</h1>
+    <div className="p-4">
+      {/* Menu Items */}
+      <h1 className="text-2xl font-bold text-center mb-6">Our Menu</h1>
       
-      {/* Grid of items */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-        gap: '20px',
-        padding: '20px'
-      }}>
-        {items.map((item) => (
-          <div key={item.Item_ID}>
-            {/* Item Card */}
-            <div 
-              onClick={() => handleItemClick(item)}
-              style={{
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                overflow: 'hidden',
-                cursor: 'pointer',
-                backgroundColor: selectedItem?.Item_ID === item.Item_ID ? '#f0f0f0' : 'white'
-              }}
-            >
-              {/* Item Image */}
-              <img 
-                src={`/api/placeholder/250/200`}
-                alt={item.Item_Name}
-                style={{
-                  width: '100%',
-                  height: '200px',
-                  objectFit: 'cover'
-                }}
-              />
-              
-              {/* Item Info */}
-              <div style={{ padding: '15px' }}>
-                <h3 style={{ marginBottom: '10px', fontSize: '18px' }}>{item.Item_Name}</h3>
-                <p style={{ color: '#666' }}>${item.Unit_Price || 'N/A'}</p>
-              </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Items Grid */}
+        <div className="col-span-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {items.map((item) => (
+              <div key={item.Item_ID} className="border rounded-lg overflow-hidden">
+                <div 
+                  onClick={() => handleItemClick(item)}
+                  className="cursor-pointer"
+                >
+                  <img 
+                    src={`/api/placeholder/250/200`}
+                    alt={item.Item_Name}
+                    className="w-full h-48 object-cover"
+                  />
+                  
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold">{item.Item_Name}</h3>
+                    <p className="text-gray-600">${item.Unit_Price}</p>
+                  </div>
 
-              {/* Item Details (shows when selected) */}
-              {selectedItem?.Item_ID === item.Item_ID && itemDetails && (
-                <div style={{ 
-                  padding: '15px',
-                  borderTop: '1px solid #ddd',
-                  backgroundColor: '#f8f8f8'
-                }}>
-                  <h4 style={{ marginBottom: '10px', fontSize: '16px' }}>Nutrition Facts</h4>
-                  <p>Calories: {itemDetails.Calories}</p>
-                  <p>Protein: {itemDetails.Protein}g</p>
-                  <p>Sugar: {itemDetails.Sugar}g</p>
-                  <p>Total Carbs: {itemDetails.Total_Carbs}g</p>
-                  <p>Total Fat: {itemDetails.Total_Fat}g</p>
+                  {selectedItem?.Item_ID === item.Item_ID && itemDetails && (
+                    <div className="p-4 bg-gray-50 border-t">
+                      <h4 className="font-semibold mb-2">Nutrition Facts</h4>
+                      <p>Calories: {itemDetails.Calories}</p>
+                      <p>Protein: {itemDetails.Protein}g</p>
+                      <p>Sugar: {itemDetails.Sugar}g</p>
+                      <p>Total Carbs: {itemDetails.Total_Carbs}g</p>
+                      <p>Total Fat: {itemDetails.Total_Fat}g</p>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+                
+                <div className="p-4 border-t">
+                  <button 
+                    onClick={() => handleAddToBasket(item)}
+                    className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+                  >
+                    Add to Basket
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+
+        {/* Shopping Basket */}
+        <div className="border rounded-lg p-4">
+          <h2 className="text-xl font-bold mb-4">Your Basket</h2>
+          <Basket
+            items={basketItems}
+            updateQuantity={handleUpdateQuantity}
+            removeItem={handleRemoveFromBasket}
+          />
+        </div>
       </div>
     </div>
   );

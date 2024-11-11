@@ -1,22 +1,23 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import styles from './Basket.css';
+import ItemCard from './ItemCard';
+import { calculateTotal } from './utils';
 
-const Basket = ({ items, updateQuantity, removeItem, total }) => {
+const Basket = ({ items, updateQuantity, removeItem }) => {
   const navigate = useNavigate();
 
-  const handleCheckout = () => {
+  const handleCheckoutClick = () => {
     navigate('/checkout');
   };
 
-  if (!items.length) {
+  if (!items?.length) {
     return (
-      <div className={styles.emptyBasket}>
-        <h2>Your basket is empty</h2>
-        <p>Add some delicious ice cream to get started!</p>
-        <button 
+      <div className="p-4 text-center">
+        <h2 className="text-xl font-bold mb-4">Your basket is empty</h2>
+        <p className="mb-4">Add some delicious ice cream to get started!</p>
+        <button
           onClick={() => navigate('/shop')}
-          className={styles.continueShoppingBtn}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
         >
           Continue Shopping
         </button>
@@ -25,58 +26,29 @@ const Basket = ({ items, updateQuantity, removeItem, total }) => {
   }
 
   return (
-    <div className={styles.basketContainer}>
-      <h2 className={styles.title}>Your Basket</h2>
-      
-      <div className={styles.itemList}>
+    <div className="max-w-lg mx-auto p-4">
+      <h2 className="text-2xl font-bold mb-6">Your Basket</h2>
+
+      <div className="space-y-4">
         {items.map((item) => (
-          <div key={item.Item_ID} className={styles.basketItem}>
-            <div className={styles.itemImage}>
-              <img src="/api/placeholder/80/80" alt={item.Item_Name} />
-            </div>
-            
-            <div className={styles.itemDetails}>
-              <h3>{item.Item_Name}</h3>
-              <p className={styles.price}>${item.Unit_Price.toFixed(2)}</p>
-            </div>
-
-            <div className={styles.quantityControls}>
-              <button 
-                onClick={() => updateQuantity(item.Item_ID, item.quantity - 1)}
-                disabled={item.quantity <= 1}
-              >
-                -
-              </button>
-              <span>{item.quantity}</span>
-              <button 
-                onClick={() => updateQuantity(item.Item_ID, item.quantity + 1)}
-              >
-                +
-              </button>
-            </div>
-
-            <div className={styles.itemTotal}>
-              ${(item.Unit_Price * item.quantity).toFixed(2)}
-            </div>
-
-            <button 
-              onClick={() => removeItem(item.Item_ID)}
-              className={styles.removeBtn}
-            >
-              ×
-            </button>
-          </div>
+          <ItemCard
+            key={item.Item_ID}
+            item={item}
+            updateQuantity={updateQuantity}
+            removeItem={removeItem}
+          />
         ))}
       </div>
 
-      <div className={styles.basketSummary}>
-        <div className={styles.subtotal}>
-          <span>Subtotal:</span>
-          <span>${total.toFixed(2)}</span>
+      <div className="mt-6 border-t pt-4">
+        <div className="flex justify-between items-center mb-4">
+          <span className="text-xl font-semibold">Total:</span>
+          <span className="text-xl">${calculateTotal(items)}</span>
         </div>
-        <button 
-          onClick={handleCheckout}
-          className={styles.checkoutBtn}
+
+        <button
+          onClick={handleCheckoutClick}
+          className="w-full bg-green-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors"
         >
           Proceed to Checkout
         </button>

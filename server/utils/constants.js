@@ -27,6 +27,13 @@ const CUSTOMER_ERRORS = {
     INSUFFICIENT_STOCK: 'Insufficient stock for one or more items',
 };
 
+const REPORT_ERRORS = {
+    SALES_REPORT_ERROR: 'Error generating sales report',
+    INVENTORY_REPORT_ERROR: 'Error generating inventory report',
+    INVALID_DATE_RANGE: 'Invalid date range provided',
+    NO_DATA_AVAILABLE: 'No data available for the specified period'
+}
+
 const TRANSACTION_ERRORS = {
     INSUFFICIENT_STOCK: 'One or more items are out of stock',
     PAYMENT_FAILED: 'Payment processing failed',
@@ -47,5 +54,7 @@ module.exports = {
     AUTH_ERRORS,
     CUSTOMER_ERRORS,
     TRANSACTION_ERRORS,
-    EMPLOYEE_ERRORS
+    EMPLOYEE_ERRORS,
+    REPORT_ERRORS    
 };
+
