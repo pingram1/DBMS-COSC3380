@@ -15,7 +15,9 @@ const CustomerDashboard = lazy(() => import('./pages/CustomerDashboard/CustomerD
 const InventoryManagement = lazy(() => import('./pages/EmployeeDashboard/InventoryManagement/InventoryManagement'));
 const Checkout = lazy(() => import('./components/Checkout/Checkout'));
 const OrderConfirmation = lazy(() => import('./components/Checkout/OrderConfirmation'));
-
+const Reports = lazy(() => import('./pages/AdminDashboard/SaleReports/Reports'));
+const InventoryReport = lazy(() => import('./pages/AdminDashboard/SaleReports/InventoryReport'));
+const SalesReport = lazy(() => import('./pages/AdminDashboard/SaleReports/SalesReport'));
 function App() {
   initialize();
 
@@ -122,6 +124,19 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            {/* Add Reports Routes */}
+            <Route
+              path="/admin/reports"
+              element={
+                <ProtectedRoute allowedRole="admin">
+                  <Reports />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="sales" element={<SalesReport />} />
+              <Route path="inventory" element={<InventoryReport />} />
+            </Route>
           </Routes>
         </div>
       </Suspense>
