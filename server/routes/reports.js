@@ -6,7 +6,7 @@ const { authMiddleware, isStrictAdmin } = require('../middlewares/auth');
 // Sales Report
 router.get('/sales', authMiddleware, isStrictAdmin, ReportController.getSalesReport);
 
-// Inventory Report
+// Inventory Sale Report
 router.get('/inventory', authMiddleware, isStrictAdmin, ReportController.getInventoryReport);
 
 module.exports = router;

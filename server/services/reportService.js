@@ -29,11 +29,23 @@ class ReportService {
                     ? salesData.reduce((sum, day) => sum + Number(day.revenue), 0) / 
                       salesData.reduce((sum, day) => sum + Number(day.orders), 0)
                     : 0,
-                topSellingItems
+                topSellingItems: topSellingItems.map(item => ({
+                    ...item,
+                    revenue: Number(item.revenue),
+                    profit: Number(item.profit)
+                }))
             };
 
             await connection.commit();
-            return { salesData, summary };
+            return {
+                salesData: salesData.map(day => ({
+                    ...day,
+                    revenue: Number(day.revenue),
+                    profit: Number(day.profit),
+                    orders: Number(day.orders)
+                })),
+                summary
+            };
 
         } catch (error) {
             await connection.rollback();

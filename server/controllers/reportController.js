@@ -4,7 +4,6 @@ const { REPORT_ERRORS } = require('../utils/constants');
 class ReportController {
     static async getSalesReport(req, res) {
         try {
-            console.log('Fetching sales report...');
             const startDate = new Date(req.query.startDate);
             const endDate = new Date(req.query.endDate);
 

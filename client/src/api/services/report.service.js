@@ -2,6 +2,7 @@ import { api } from '../axios';
 import API_CONFIG from '../config';
 
 export const reportService = {
+
     getSalesReport: async (startDate, endDate) => {
         try {
             const response = await api.get(
@@ -26,8 +27,8 @@ export const reportService = {
                 API_CONFIG.ENDPOINTS.REPORTS.INVENTORY,
                 {
                     params: {
-                        startDate: startDate?.toISOString(),
-                        endDate: endDate?.toISOString()
+                        startDate: startDate,
+                        endDate: endDate
                     }
                 }
             );
