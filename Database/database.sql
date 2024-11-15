@@ -27,6 +27,12 @@ SET @@GLOBAL.GTID_PURGED=/*!80000 '+'*/ '6fc030c0-7f5b-11ef-8e0c-0ed7bb81195b:1-
 -- Table structure for table `customer`
 --
 
+CREATE TABLE `membership` (
+    `Membership_ID` INT AUTO_INCREMENT PRIMARY KEY,
+    `Membership_Level` VARCHAR(30) NOT NULL UNIQUE
+);
+
+
 DROP TABLE IF EXISTS `customer`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -50,9 +56,40 @@ CREATE TABLE `customer` (
 
 LOCK TABLES `customer` WRITE;
 /*!40000 ALTER TABLE `customer` DISABLE KEYS */;
-INSERT INTO `customer` VALUES (401,'Gold','1234567890','123 Main St','2024-01-01',12,NULL,100,20,120),(402,'Silver','2345678901','456 Oak St','2024-02-01',10,NULL,80,10,90),(403,'Bronze','3456789012','789 Pine St','2024-03-01',8,NULL,50,5,55),(404,'Gold','4567890123','101 Maple St','2024-04-01',14,NULL,110,30,140),(405,'Silver','5678901234','202 Birch St','2024-05-01',9,NULL,70,15,85),(406,'Bronze','6789012345','303 Cedar St','2024-06-01',7,NULL,60,10,70),(407,'Gold','7890123456','404 Elm St','2024-07-01',15,NULL,120,25,145),(408,'Silver','8901234567','505 Spruce St','2024-08-01',11,NULL,90,20,110),(409,'Bronze','9012345678','606 Willow St','2024-09-01',6,NULL,40,5,45),(410,'Gold','0123456789','707 Ash St','2024-10-01',13,NULL,130,35,165),(411,'Silver','1112223333','808 Birch St','2024-11-01',10,NULL,85,15,100),(412,'Gold','2223334444','909 Cedar St','2024-12-01',12,NULL,140,40,180),(413,'Bronze','3334445555','1010 Oak St','2025-01-01',5,NULL,30,10,40),(414,'Silver','4445556666','1111 Pine St','2025-02-01',8,NULL,60,20,80),(415,'Gold','5556667777','1212 Spruce St','2025-03-01',14,NULL,150,50,200),(416,'Bronze','6667778888','1313 Maple St','2025-04-01',7,NULL,55,10,65),(417,'Silver','7778889999','1414 Cedar St','2025-05-01',9,NULL,75,20,95),(418,'Gold','8889990000','1515 Oak St','2025-06-01',13,NULL,135,40,175),(419,'Silver','9990001111','1616 Pine St','2025-07-01',11,NULL,95,25,120),(420,'Bronze','0001112222','1717 Spruce St','2025-08-01',6,NULL,45,5,50),(421,'Gold','1112223334','1818 Elm St','2025-09-01',15,NULL,145,50,195),(422,'Silver','2223334445','1919 Birch St','2025-10-01',10,NULL,85,15,100),(423,'Gold','3334445556','2020 Maple St','2025-11-01',12,NULL,155,45,200),(424,'Bronze','4445556667','2121 Oak St','2025-12-01',5,NULL,35,10,45),(425,'Silver','5556667778','2222 Pine St','2026-01-01',8,NULL,65,20,85),(426,'Gold','6667778889','2323 Spruce St','2026-02-01',14,NULL,160,55,215),(427,'Bronze','7778889990','2424 Elm St','2026-03-01',6,NULL,50,5,55),(428,'Silver','8889990001','2525 Cedar St','2026-04-01',9,NULL,75,25,100),(429,'Gold','9990001112','2626 Willow St','2026-05-01',13,NULL,135,40,175),(430,'Bronze','0001112223','2727 Ash St','2026-06-01',7,NULL,60,10,70);
+INSERT INTO `customer` VALUES (401,'Gold','1234567890','2024-01-01',12,NULL,100,20,120),(402,'Silver','2345678901','2024-02-01',10,NULL,80,10,90),(403,'Bronze','3456789012','2024-03-01',8,NULL,50,5,55),(404,'Gold','4567890123','2024-04-01',14,NULL,110,30,140),(405,'Silver','5678901234','2024-05-01',9,NULL,70,15,85),(406,'Bronze','6789012345','2024-06-01',7,NULL,60,10,70),(407,'Gold','7890123456','2024-07-01',15,NULL,120,25,145),(408,'Silver','8901234567','2024-08-01',11,NULL,90,20,110),(409,'Bronze','9012345678','2024-09-01',6,NULL,40,5,45),(410,'Gold','0123456789','2024-10-01',13,NULL,130,35,165),(411,'Silver','1112223333','2024-11-01',10,NULL,85,15,100),(412,'Gold','2223334444','909 Cedar St','2024-12-01',12,NULL,140,40,180),(413,'Bronze','3334445555','1010 Oak St','2025-01-01',5,NULL,30,10,40),(414,'Silver','4445556666','1111 Pine St','2025-02-01',8,NULL,60,20,80),(415,'Gold','5556667777','1212 Spruce St','2025-03-01',14,NULL,150,50,200),(416,'Bronze','6667778888','1313 Maple St','2025-04-01',7,NULL,55,10,65),(417,'Silver','7778889999','1414 Cedar St','2025-05-01',9,NULL,75,20,95),(418,'Gold','8889990000','1515 Oak St','2025-06-01',13,NULL,135,40,175),(419,'Silver','9990001111','1616 Pine St','2025-07-01',11,NULL,95,25,120),(420,'Bronze','0001112222','1717 Spruce St','2025-08-01',6,NULL,45,5,50),(421,'Gold','1112223334','1818 Elm St','2025-09-01',15,NULL,145,50,195),(422,'Silver','2223334445','2025-10-01',10,NULL,85,15,100),(423,'Gold','3334445556','2025-11-01',12,NULL,155,45,200),(424,'Bronze','4445556667','2025-12-01',5,NULL,35,10,45),(425,'Silver','5556667778','2026-01-01',8,NULL,65,20,85),(426,'Gold','6667778889','2026-02-01',14,NULL,160,55,215),(427,'Bronze','7778889990','2026-03-01',6,NULL,50,5,55),(428,'Silver','8889990001','2026-04-01',9,NULL,75,25,100),(429,'Gold','9990001112','2026-05-01',13,NULL,135,40,175),(430,'Bronze','0001112223','2026-06-01',7,NULL,60,10,70);
 /*!40000 ALTER TABLE `customer` ENABLE KEYS */;
 UNLOCK TABLES;
+
+
+CREATE TABLE `customer_address` (
+    `Address_ID` INT AUTO_INCREMENT PRIMARY KEY,
+    `Customer_ID` INT,
+    `Street_Address` VARCHAR(50),
+    `City` VARCHAR(30),
+    `State` VARCHAR(20),
+    `Zip_Code` VARCHAR(10),
+    FOREIGN KEY (`Customer_ID`) REFERENCES `customer`(`Customer_ID`) ON DELETE CASCADE
+);
+
+
+ALTER TABLE `customer` 
+ADD COLUMN `Membership_ID` INT,
+DROP COLUMN `Member_Length`,
+ADD FOREIGN KEY (`Membership_ID`) REFERENCES `membership`(`Membership_ID`);
+
+
+CREATE TRIGGER update_reward_points
+AFTER INSERT ON `transaction_item`
+FOR EACH ROW
+BEGIN
+    DECLARE points INT;
+    SET points = NEW.Item_Quantity * 10;
+    UPDATE `customer` 
+    SET `Current_Discount_Points` = `Current_Discount_Points` + points,
+        `Total_Accrued_Discount_Points` = `Total_Accrued_Discount_Points` + points
+    WHERE `Customer_ID` = NEW.Customer_ID;
+END;
+
 
 --
 -- Table structure for table `employee`
@@ -416,6 +453,7 @@ LOCK TABLES `vendorinvoice` WRITE;
 INSERT INTO `vendorinvoice` VALUES (1,1,'2024-01-01','Credit',1500.00),(2,2,'2024-01-02','Credit',1800.00),(3,3,'2024-01-03','Credit',2200.00),(4,4,'2024-01-04','Credit',1400.00),(5,1,'2024-01-05','Credit',1600.00),(6,2,'2024-01-06','Credit',2100.00),(7,3,'2024-01-07','Credit',2300.00),(8,4,'2024-01-08','Credit',2000.00);
 /*!40000 ALTER TABLE `vendorinvoice` ENABLE KEYS */;
 UNLOCK TABLES;
+
 
 --
 -- Dumping events for database 'test'
