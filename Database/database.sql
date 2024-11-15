@@ -34,7 +34,6 @@ CREATE TABLE `customer` (
   `Customer_ID` int NOT NULL AUTO_INCREMENT,
   `Membership_Level` varchar(30) NOT NULL,
   `Phone_Number` varchar(15) DEFAULT NULL,
-  `Address` varchar(30) DEFAULT NULL,
   `Account_Creation_Date` date DEFAULT NULL,
   `Member_Length` int DEFAULT NULL,
   `Account_End` date DEFAULT NULL,
